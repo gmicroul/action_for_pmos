@@ -50,13 +50,12 @@ jobs:
           pmbootstrap --version
       - name: init
         run: |
-          echo -e "\n${{ github.event.inputs.set_Channel }}\n${{ github.event.inputs.set_Device }}\n${{ github.event.inputs.set_code }}\n${{ github.event.inputs.set_kernel }}\n\nwpa_supplicant\n${{ github.event.inputs.set_ui }}\n\n\n\n\n\n\n\n" |  pmbootstrap init
+          echo -e "\n${{ github.event.inputs.set_Channel }}\n${{ github.event.inputs.set_Device }}\n${{ github.event.inputs.set_code }}\n\nwpa_supplicant\n${{ github.event.inputs.set_ui }}\n\n\n\n\n\n\n\n" |  pmbootstrap init
           # pmbootstrap init <<EOF
           
           # ${{ github.event.inputs.set_Channel }}
           # ${{ github.event.inputs.set_Device }}
           # ${{ github.event.inputs.set_code }}
-          # ${{ github.event.inputs.set_kernel }}
           # wpa_supplicant
           # ${{ github.event.inputs.set_ui }}
 
@@ -76,8 +75,8 @@ jobs:
           
       - name: build
         run: |
-          # pmbootstrap build linux-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }} --force
-          pmbootstrap build device-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }} --force
+          # pmbootstrap build liunx-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }}
+          # pmbootstrap build device-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }}
           echo -e "1234\n1234\n" | pmbootstrap install --android-recovery-zip --recovery-install-partition=data
           # <<EOF
 
