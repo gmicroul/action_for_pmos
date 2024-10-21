@@ -14,7 +14,7 @@ on:
       set_code:
         description: "code"
         required: true
-        default: "dumpling"
+        default: "msm8998"
       set_kernel:
         description: "kernel"
         required: true
