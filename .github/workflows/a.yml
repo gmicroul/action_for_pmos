@@ -1,4 +1,4 @@
-name: Build pmos aa
+name: Build pmos aries
 on:
   repository_dispatch:
   workflow_dispatch:
@@ -14,11 +14,11 @@ on:
       set_code:
         description: "code"
         required: true
-        default: "gemini"
+        default: "aries"
       set_ui:
         description: "ui"
         required: true
-        default: "gnome-mobile"
+        default: "console"
 env:
   TZ: Asia/Shanghai
 
