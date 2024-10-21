@@ -76,7 +76,7 @@ jobs:
           
       - name: build
         run: |
-          pmbootstrap build linux-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }} --force
+          # pmbootstrap build linux-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }} --force
           pmbootstrap build device-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }} --force
           echo -e "1234\n1234\n" | pmbootstrap install --android-recovery-zip --recovery-install-partition=data
           # <<EOF
