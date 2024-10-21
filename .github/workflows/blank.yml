@@ -69,15 +69,4 @@ jobs:
           name: pmos
           path: dirname $(readlink /tmp/postmarketOS-export/pmos-*.zip)
 
-      - name: Upload image to Release
-        uses: ncipollo/release-action@main
-        if: steps.compile.outputs.status == 'success' && !cancelled()
-        with:
-          tag: Linux_Kernel_${{ env.COMPILE_STARTINGTIME }}
-          artifacts: /workdir/*
-          allowUpdates: true
-          token: ${{ secrets.GITHUB_TOKEN }}
-          body: |
-            This is Linux Kernel ${{ env.LINUX
-      
-          
+
