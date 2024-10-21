@@ -44,7 +44,7 @@ jobs:
           ln -s "$PWD/pmbootstrap.py" ~/.local/bin/pmbootstrap
           PATH="$HOME/.local/bin:$PATH"
           pmbootstrap --version
-      - name: build
+      - name: init
         run: |
           echo -e "\n${{ github.event.inputs.set_Channel }}\n${{ github.event.inputs.set_Device }}\n${{ github.event.inputs.set_code }}\n\nwpa_supplicant\n${{ github.event.inputs.set_ui }}\n\n\n\n\n\n\n\n" |  pmbootstrap init
           # pmbootstrap init <<EOF
@@ -68,8 +68,10 @@ jobs:
           echo "###################"
 
           echo "###################"
-
-           echo -e "1234\n1234\n" | pmbootstrap install --android-recovery-zip --recovery-install-partition=data
+          
+      - name: build
+        run: |
+          echo -e "1234\n1234\n" | pmbootstrap install --android-recovery-zip --recovery-install-partition=data
           # <<EOF
 
           # # 1234
