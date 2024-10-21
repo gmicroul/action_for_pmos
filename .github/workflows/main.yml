@@ -15,6 +15,10 @@ on:
         description: "code"
         required: true
         default: "dumpling"
+      set_kernel:
+        description: "kernel"
+        required: true
+        default: "mainline"
       set_ui:
         description: "ui"
         required: true
@@ -46,12 +50,13 @@ jobs:
           pmbootstrap --version
       - name: init
         run: |
-          echo -e "\n${{ github.event.inputs.set_Channel }}\n${{ github.event.inputs.set_Device }}\n${{ github.event.inputs.set_code }}\n\nwpa_supplicant\n${{ github.event.inputs.set_ui }}\n\n\n\n\n\n\n\n" |  pmbootstrap init
+          echo -e "\n${{ github.event.inputs.set_Channel }}\n${{ github.event.inputs.set_Device }}\n${{ github.event.inputs.set_code }}\n${{ github.event.inputs.set_kernel }}\n\nwpa_supplicant\n${{ github.event.inputs.set_ui }}\n\n\n\n\n\n\n\n" |  pmbootstrap init
           # pmbootstrap init <<EOF
           
           # ${{ github.event.inputs.set_Channel }}
           # ${{ github.event.inputs.set_Device }}
           # ${{ github.event.inputs.set_code }}
+          # ${{ github.event.inputs.set_kernel }}
           # wpa_supplicant
           # ${{ github.event.inputs.set_ui }}
 
