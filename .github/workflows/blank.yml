@@ -46,7 +46,7 @@ jobs:
           pmbootstrap --version
       - name: build
         run: |
-          echo -e "\n${{ github.event.inputs.set_Channel }}\n${{ github.event.inputs.set_Device }}\n${{ github.event.inputs.set_code }}\n\nwpa_supplicant\n${{ github.event.inputs.set_ui }}\n\n\n\n\n1234\n1234\n1234\n\n\n" |  pmbootstrap init
+          echo -e "\n${{ github.event.inputs.set_Channel }}\n${{ github.event.inputs.set_Device }}\n${{ github.event.inputs.set_code }}\n\nwpa_supplicant\n${{ github.event.inputs.set_ui }}\n\n\n\n\n\n\n\n" |  pmbootstrap init
           # pmbootstrap init <<EOF
           
           # ${{ github.event.inputs.set_Channel }}
@@ -63,12 +63,18 @@ jobs:
 
           
           # EOF
+          echo "###################"
 
-          pmbootstrap install --android-recovery-zip --recovery-install-partition=data <<EOF
+          echo "###################"
 
-          1234
-          1234
-          EOF
+          echo "###################"
+
+           echo -e "1234\n1234\n" | pmbootstrap install --android-recovery-zip --recovery-install-partition=data
+          # <<EOF
+
+          # # 1234
+          # # 1234
+          # # EOF
           pmbootstrap export
           zip_path=$(readlink -f /tmp/postmarketOS-export/pmos-*.zip)
           echo "Zip path: $zip_path"
