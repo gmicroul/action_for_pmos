@@ -1,0 +1,83 @@
+name: Build pmos
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      set_Channel:
+        description: "Channel"
+        required: true
+        default: "edge"
+      set_Device:
+        description: "Device"
+        required: true
+        default: "xiaomi"
+      set_code:
+        description: "code"
+        required: true
+        default: "beryllium"
+      set_ui:
+        description: "ui"
+        required: true
+        default: "gnome-mobile"
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Installation pmbootstrap
+        run: |
+          sudo apt update
+          sudo apt install git 
+          git clone https://gitlab.com/postmarketOS/pmbootstrap.git
+          git checkout 2.3.x
+          cd pmbootstrap
+          mkdir -p ~/.local/bin
+          ln -s "$PWD/pmbootstrap.py" ~/.local/bin/pmbootstrap
+          PATH="$HOME/.local/bin:$PATH"
+          pmbootstrap --version
+      - name: build
+        run: |
+          pmbootstrap pull
+          pmbootstrap init <<EOF
+
+          edge
+          xiaomi
+          beryllium
+          gnome-mobile
+
+
+
+
+
+
+          EOF
+          pmbootstrap build
+          pmbootstrap install
+          pmbootstrap install --android-recovery-zip --recovery-install-partition=data
+          pmbootstrap export
+          
+      - name: Upload zip
+        uses: actions/upload-artifact@v3
+        with:
+          name: pmos
+          path: dirname $(readlink /tmp/postmarketOS-export/pmos-*.zip)
+
+      - name: Upload image to Release
+        uses: ncipollo/release-action@main
+        if: steps.compile.outputs.status == 'success' && !cancelled()
+        with:
+          tag: Linux_Kernel_${{ env.COMPILE_STARTINGTIME }}
+          artifacts: /workdir/*
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body: |
+            This is Linux Kernel ${{ env.LINUX
+      
+          
