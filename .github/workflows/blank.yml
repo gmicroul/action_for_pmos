@@ -33,6 +33,7 @@ jobs:
 
       - name: Installation pmbootstrap
         run: |
+          
           sudo apt update
           sudo apt install git 
           git clone https://gitlab.com/postmarketOS/pmbootstrap.git
@@ -45,13 +46,14 @@ jobs:
           pmbootstrap --version
       - name: build
         run: |
-          pmbootstrap init <<EOF
+          echo -e "\n${{ github.event.inputs.set_Channel }}\n${{ github.event.inputs.set_Channel }}\n${{ github.event.inputs.set_code }}\nwpa_supplicant\n${{ github.event.inputs.set_ui }}\n\n\n\n\n\n\n" | ./script.sh
+          # pmbootstrap init <<EOF
           
-          ${{ github.event.inputs.set_Channel }}
-          ${{ github.event.inputs.set_Device }}
-          ${{ github.event.inputs.set_code }}
-          wpa_supplicant
-          ${{ github.event.inputs.set_ui }}
+          # ${{ github.event.inputs.set_Channel }}
+          # ${{ github.event.inputs.set_Device }}
+          # ${{ github.event.inputs.set_code }}
+          # wpa_supplicant
+          # ${{ github.event.inputs.set_ui }}
 
 
 
@@ -60,7 +62,7 @@ jobs:
 
 
           
-          EOF
+          # EOF
 
           pmbootstrap install --android-recovery-zip --recovery-install-partition=data <<EOF
 
