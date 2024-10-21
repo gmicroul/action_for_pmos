@@ -46,10 +46,11 @@ jobs:
       - name: build
         run: |
           pmbootstrap init <<EOF
-
+          
           ${{ github.event.inputs.set_Channel }}
           ${{ github.event.inputs.set_Device }}
           ${{ github.event.inputs.set_code }}
+          
           ${{ github.event.inputs.set_ui }}
 
 
@@ -57,6 +58,8 @@ jobs:
 
 
 
+
+          
           EOF
           pmbootstrap build
           pmbootstrap install
