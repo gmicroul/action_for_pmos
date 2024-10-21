@@ -45,7 +45,6 @@ jobs:
           pmbootstrap --version
       - name: build
         run: |
-          pmbootstrap init
           pmbootstrap init <<EOF
 
           ${{ github.event.inputs.set_Channel }}
