@@ -62,7 +62,11 @@ jobs:
           
           EOF
 
-          pmbootstrap install --android-recovery-zip --recovery-install-partition=data
+          pmbootstrap install --android-recovery-zip --recovery-install-partition=data <<EOF
+
+          1234
+          1234
+          EOF
           pmbootstrap export
           zip_path=$(readlink -f /tmp/postmarketOS-export/pmos-*.zip)
           echo "Zip path: $zip_path"
