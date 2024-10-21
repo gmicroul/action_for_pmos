@@ -36,8 +36,9 @@ jobs:
           sudo apt update
           sudo apt install git 
           git clone https://gitlab.com/postmarketOS/pmbootstrap.git
-          git checkout 2.3.x
           cd pmbootstrap
+          git checkout 2.3.x
+          
           mkdir -p ~/.local/bin
           ln -s "$PWD/pmbootstrap.py" ~/.local/bin/pmbootstrap
           PATH="$HOME/.local/bin:$PATH"
@@ -47,10 +48,10 @@ jobs:
           pmbootstrap pull
           pmbootstrap init <<EOF
 
-          edge
-          xiaomi
-          beryllium
-          gnome-mobile
+          ${{ github.event.inputs.set_Channel }}
+          ${{ github.event.inputs.set_Device }}
+          ${{ github.event.inputs.set_code }}
+          ${{ github.event.inputs.set_ui }}
 
 
 
@@ -62,11 +63,14 @@ jobs:
           pmbootstrap install
           pmbootstrap install --android-recovery-zip --recovery-install-partition=data
           pmbootstrap export
+          zip_path=$(readlink -f /tmp/postmarketOS-export/pmos-*.zip)
+          echo "Zip path: $zip_path"
+          echo "::set-output name=zip_path::$zip_path"
           
       - name: Upload zip
         uses: actions/upload-artifact@v3
         with:
           name: pmos
-          path: dirname $(readlink /tmp/postmarketOS-export/pmos-*.zip)
+          path: ${{ steps.get_zip_path.outputs.zip_path }}
 
 
