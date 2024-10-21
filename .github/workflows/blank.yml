@@ -50,7 +50,7 @@ jobs:
           ${{ github.event.inputs.set_Channel }}
           ${{ github.event.inputs.set_Device }}
           ${{ github.event.inputs.set_code }}
-          
+          wpa_supplicant
           ${{ github.event.inputs.set_ui }}
 
 
@@ -61,8 +61,7 @@ jobs:
 
           
           EOF
-          pmbootstrap build
-          pmbootstrap install
+
           pmbootstrap install --android-recovery-zip --recovery-install-partition=data
           pmbootstrap export
           zip_path=$(readlink -f /tmp/postmarketOS-export/pmos-*.zip)
