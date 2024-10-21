@@ -94,7 +94,7 @@ jobs:
         id: get_zip_path
           
       - name: Upload zip
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: pmos-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }}-${{ github.event.inputs.set_ui }}
           path: ${{ steps.get_zip_path.outputs.zip_path }}
