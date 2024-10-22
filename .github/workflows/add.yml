@@ -38,7 +38,7 @@ jobs:
         run: |
           
           sudo apt update
-          sudo apt install git 
+          sudo apt install git python3 python3-tomli
           git clone https://gitlab.com/postmarketOS/pmbootstrap.git
           cd pmbootstrap
           git checkout 2.3.x
@@ -53,6 +53,7 @@ jobs:
           pwd
           ls -al
           cp -r test/* /home/runner/.local/var/pmbootstrap/cache_git/pmaports/device/testing/
+          pmbootstrap zap -p
           echo -e "\n${{ github.event.inputs.set_Channel }}\n${{ github.event.inputs.set_Device }}\n${{ github.event.inputs.set_code }}\n\nwpa_supplicant\n${{ github.event.inputs.set_ui }}\n\n\n\n\n\n\n\n" |  pmbootstrap init
           echo "###################"
 
@@ -77,13 +78,16 @@ jobs:
           echo "Zip path: $zip_path"
           echo "zip_path=$zip_path" >> $GITHUB_ENV
         id: get_zip_path
-          
+         
       - name: Upload zip
         uses: actions/upload-artifact@v3
         with:
           name: pmos-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }}-${{ github.event.inputs.set_ui }}
           path: ${{ env.zip_path }}
-      - name: Log on failure
+
+      - name: Upload log
         if: failure()
-        run: |
-          pmbootstrap log
+        uses: actions/upload-artifact@v3
+        with:
+          name: log
+          path:  /home/runner/.local/var/pmbootstrap/log.txt
