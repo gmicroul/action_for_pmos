@@ -1,4 +1,4 @@
-name: Build pmos edite(port)
+name: Build pmos 5t(port)
 on:
   repository_dispatch:
   workflow_dispatch:
