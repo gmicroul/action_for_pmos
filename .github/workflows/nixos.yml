@@ -31,5 +31,6 @@ jobs:
       - name: nix-build
         run: |
           cd mobile-nixos
+          export NIXPKGS_ALLOW_UNFREE=1
           sudo nix-build examples\/${{ github.event.inputs.set_example }}\/ --argstr device oneplus-fajita -A outputs.android-fastboot-images
    
