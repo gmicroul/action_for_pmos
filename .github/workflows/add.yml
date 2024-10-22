@@ -14,7 +14,7 @@ on:
       set_code:
         description: "code"
         required: true
-        default: "aries"
+        default: "capricorn"
       set_ui:
         description: "ui"
         required: true
