@@ -32,5 +32,5 @@ jobs:
         run: |
           git clone https://github.com/gmicroul/mobile-nixos.git
           cd mobile-nixos
-          sudo nix-build examples\/${{ github.event.inputs.set_example }}\/ --argstr device oneplus-fajita -A outputs.default
+          sudo nix-build examples\/${{ github.event.inputs.set_example }}\/ --argstr device oneplus-fajita -A outputs.android-fastboot-images
    
