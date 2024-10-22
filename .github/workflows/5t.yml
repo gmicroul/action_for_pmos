@@ -61,10 +61,11 @@ jobs:
 
           echo "###################"
 
-          pmbootstrap pull
+        
           
       - name: build
         run: |
+          pmbootstrap pull
           pmbootstrap checksum linux-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }}
           pmbootstrap checksum device-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }}
           pmbootstrap build linux-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }} --force
