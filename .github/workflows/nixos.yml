@@ -1,0 +1,100 @@
+name: Build pmos dumpling
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      set_Channel:
+        description: "Channel"
+        required: true
+        default: "edge"
+      set_Device:
+        description: "Device"
+        required: true
+        default: "oneplus"
+      set_code:
+        description: "code"
+        required: true
+        default: "dumpling"
+      set_kernel:
+        description: "kernel"
+        required: true
+        default: "mainline"
+      set_ui:
+        description: "ui"
+        required: true
+        default: "fbkeyboard"
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Installation pmbootstrap
+        run: |
+          
+          sudo apt update
+          sudo apt install git 
+          git clone https://gitlab.com/postmarketOS/pmbootstrap.git
+          cd pmbootstrap
+          git checkout 2.3.x
+          
+          mkdir -p ~/.local/bin
+          ln -s "$PWD/pmbootstrap.py" ~/.local/bin/pmbootstrap
+          PATH="$HOME/.local/bin:$PATH"
+          pmbootstrap --version
+      - name: init
+        run: |
+          
+          echo -e "\n${{ github.event.inputs.set_Channel }}\n${{ github.event.inputs.set_Device }}\n${{ github.event.inputs.set_code }}\n${{ github.event.inputs.set_kernel }}\n\nwpa_supplicant\n${{ github.event.inputs.set_ui }}\n\n\n\n\n\n\n\n" |  pmbootstrap init
+          # pmbootstrap init <<EOF
+          
+          # ${{ github.event.inputs.set_Channel }}
+          # ${{ github.event.inputs.set_Device }}
+          # ${{ github.event.inputs.set_code }}
+          # ${{ github.event.inputs.set_kernel }}
+          # wpa_supplicant
+          # ${{ github.event.inputs.set_ui }}
+
+
+
+
+
+
+
+          
+          # EOF
+          echo "###################"
+
+          echo "###################"
+
+          echo "###################"
+
+          pmbootstrap pull
+          
+      - name: build
+        run: |
+          # pmbootstrap build liunx-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }}
+          # pmbootstrap build device-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }}
+          echo -e "1234\n1234\n" | pmbootstrap install --android-recovery-zip --recovery-install-partition=data
+          # <<EOF
+
+          # # 1234
+          # # 1234
+          # # EOF
+          pmbootstrap export
+          zip_path=$(readlink -f /tmp/postmarketOS-export/pmos-*.zip)
+          echo "Zip path: $zip_path"
+          echo "::set-output name=zip_path::$zip_path"
+        id: get_zip_path
+          
+      - name: Upload zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: pmos-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }}-${{ github.event.inputs.set_ui }}
+          path: ${{ steps.get_zip_path.outputs.zip_path }}
