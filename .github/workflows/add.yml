@@ -83,3 +83,7 @@ jobs:
         with:
           name: pmos-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }}-${{ github.event.inputs.set_ui }}
           path: ${{ env.zip_path }}
+      - name: Log on failure
+        if: failure()
+        run: |
+          pmbootstrap log

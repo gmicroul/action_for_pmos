@@ -19,10 +19,10 @@ makedepends="bash bison findutils flex installkernel openssl-dev perl"
 # Source
 _commit=staging
 source="
-	linux-xiaomi-capricorn-$_commit.tar.gz::https://gitlab.com/kschen202115/linux-6-11-rc-6/-/archive/msm8996-staging/linux-6-11-rc-6-msm8996-staging.tar.gz
+	linux-6-11-rc-6-msm8996-staging.tar.gz::https://gitlab.com/kschen202115/linux-6-11-rc-6/-/archive/msm8996-staging/linux-6-11-rc-6-msm8996-staging.tar.gz
 	config-$_flavor.$arch
 "
-builddir="$srcdir/linux-msm8996-staging"
+builddir="$srcdir/linux-6-11-rc-6-msm8996-staging"
 
 prepare() {
 	default_prepare
