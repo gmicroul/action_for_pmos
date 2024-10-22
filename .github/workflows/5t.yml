@@ -49,6 +49,7 @@ jobs:
           pmbootstrap --version
       - name: init
         run: |
+          pmbootstrap pull
           echo -e "\n\n\n\n\n\n\n\n\n\n\n\n\n" |  pmbootstrap init
           pwd
           ls -al
@@ -65,7 +66,6 @@ jobs:
           
       - name: build
         run: |
-          pmbootstrap pull
           pmbootstrap checksum linux-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }}
           pmbootstrap checksum device-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }}
           pmbootstrap build linux-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }} --force
