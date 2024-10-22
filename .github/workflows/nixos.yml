@@ -25,11 +25,13 @@ jobs:
           
           sudo apt update
           sudo apt install git nix
-          git clone https://github.com/mobile-nixos/mobile-nixos.git
+          
           
 
       - name: nix-build
         run: |
+          su
+          git clone https://github.com/mobile-nixos/mobile-nixos.git
           cd mobile-nixos
           export NIXPKGS_ALLOW_UNFREE=1
           nix-build examples\/${{ github.event.inputs.set_example }}\/ --argstr device oneplus-fajita -A outputs.android-fastboot-images
