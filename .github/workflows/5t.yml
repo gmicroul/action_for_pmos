@@ -49,8 +49,8 @@ jobs:
           pmbootstrap --version
       - name: init
         run: |
-          pmbootstrap pull
           echo -e "\n\n\n\n\n\n\n\n\n\n\n\n\n" |  pmbootstrap init
+          pmbootstrap pull
           pwd
           ls -al
           cp -r test/* /home/runner/.local/var/pmbootstrap/cache_git/pmaports/device/testing/
