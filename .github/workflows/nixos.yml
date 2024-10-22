@@ -30,8 +30,8 @@ jobs:
 
       - name: nix-build
         run: |
-          echo -e "1234\n1234\n" | sudo passwd
-          echo -e "1234\n" | sudo su          
+          echo -e "1234\n1234\n" | sudo passwd root
+          echo "1234\n" | sudo su          
           git clone https://github.com/mobile-nixos/mobile-nixos.git
           cd mobile-nixos
           export NIXPKGS_ALLOW_UNFREE=1
