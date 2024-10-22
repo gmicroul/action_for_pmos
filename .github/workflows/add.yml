@@ -53,6 +53,7 @@ jobs:
           pwd
           ls -al
           cp -r test/* /home/runner/.local/var/pmbootstrap/cache_git/pmaports/device/testing/
+          pmbootstrap zap -p
           echo -e "\n${{ github.event.inputs.set_Channel }}\n${{ github.event.inputs.set_Device }}\n${{ github.event.inputs.set_code }}\n\nwpa_supplicant\n${{ github.event.inputs.set_ui }}\n\n\n\n\n\n\n\n" |  pmbootstrap init
           echo "###################"
 
