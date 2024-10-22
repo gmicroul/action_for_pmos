@@ -46,7 +46,6 @@ jobs:
           pmbootstrap --version
       - name: init
         run: |
-          cd ..
           echo -e "\n\n\n\n\n\n\n\n\n\n\n\n\n" |  pmbootstrap init
           pwd
           ls -al
