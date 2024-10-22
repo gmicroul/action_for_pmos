@@ -1,0 +1,6 @@
+./lib/firmware/qcom/msm8996/capricorn/a530_zap.mbn
+./lib/firmware/qcom/msm8996/capricorn/adsp.mbn
+./lib/firmware/qcom/msm8996/capricorn/mba.mbn
+./lib/firmware/qcom/msm8996/capricorn/slpi.mbn
+./lib/firmware/qcom/msm8996/capricorn/venus.mbn
+./lib/firmware/qcom/msm8996/capricorn/modem.mbn

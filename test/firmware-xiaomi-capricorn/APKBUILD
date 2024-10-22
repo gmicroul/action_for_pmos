@@ -1,0 +1,37 @@
+# Maintainer: Furkan Sonkaya (sepkov) <furkansonkaya61@gmail.com>
+pkgname=firmware-xiaomi-capricorn
+pkgver=1
+pkgrel=1
+pkgdesc="Firmware for Xiaomi Mi 5s"
+url="https://gitlab.com/sepkov/firmware-xiaomi-capricorn"
+arch="aarch64"
+license="proprietary"
+options="!strip !check !archcheck !tracedeps pmb:cross-native"
+
+_commit="d0c8e321b3a46f885b1437191a6b669ac93f356e"
+
+source="
+	$pkgname.tar.gz::$url/-/archive/$_commit/$pkgname-$_commit.tar.gz
+	"
+_mbns="
+        a530_zap.mbn
+        adsp.mbn
+        mba.mbn
+        slpi.mbn
+        venus.mbn
+	modem.mbn
+        "
+
+package() {
+        cd "$srcdir/$pkgname-$_commit/"
+
+        # Install MBNs
+        for _i in $_mbns; do
+                install -Dm644 $_i "$pkgdir/lib/firmware/qcom/msm8996/capricorn/$_i"
+        done
+}
+
+
+sha512sums="
+eaff9558e4de6826643dfbb0274ddfce1c9b195d50026aa91918ee23e26afd40f4858e5b3505ed38bbddddc97362845bdecdffbac456dc7c27c0fe22e45b97be  firmware-xiaomi-capricorn.tar.gz
+"

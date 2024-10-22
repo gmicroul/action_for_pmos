@@ -1,0 +1,42 @@
+# Reference: <https://postmarketos.org/devicepkg>
+pkgname=device-xiaomi-capricorn
+pkgdesc="Xiaomi Mi 5s"
+pkgver=0.2
+pkgrel=0
+url="https://postmarketos.org"
+license="MIT"
+arch="aarch64"
+options="!check !archcheck"
+depends="
+	linux-xiaomi-capricorn
+	mkbootimg
+	postmarketos-base
+	soc-qcom-msm8996
+	soc-qcom-msm8996-ucm
+"
+makedepends="devicepkg-dev"
+source="deviceinfo"
+subpackages="$pkgname-nonfree-firmware:nonfree_firmware"
+
+build() {
+	devicepkg_build $startdir $pkgname
+}
+
+package() {
+	devicepkg_package $startdir $pkgname
+}
+
+nonfree_firmware() {
+        pkgdesc="GPU/Modem/Venus/ADSP/SLPI/WiFi/Bluetooth Firmware"
+        depends="
+                firmware-xiaomi-capricorn
+                linux-firmware-ath10k
+                linux-firmware-qca
+                soc-qcom-msm8996-nonfree-firmware
+                "
+        mkdir "$subpkgdir"
+}
+
+sha512sums="
+33c556ebea70a7a7f67edd0b22420691c5006d65555eaa5c14d028efd6ef89cee5526454b46866ef17e86f702280fcfabed98eabb728e1726881cbdcdf52775d  deviceinfo
+"

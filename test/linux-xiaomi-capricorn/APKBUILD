@@ -1,0 +1,53 @@
+# Maintainer: Furkan Sonkaya (sepkov) <furkansonkaya61@gmail.com>
+# Kernel config based on: arch/arm64/configs/defconfig
+
+_flavor="xiaomi-capricorn"
+pkgname=linux-$_flavor
+pkgver=6.11.0
+pkgrel=6
+pkgdesc="Kernel for Xiaomi Mi 5S"
+arch="aarch64"
+_carch="arm64"
+url="https://gitlab.com/sepkov/linux-xiaomi-capricorn"
+license="GPL-2.0-only"
+options="!strip !check !tracedeps
+	pmb:cross-native
+	pmb:kconfigcheck-community
+"
+makedepends="bash bison findutils flex installkernel openssl-dev perl"
+
+# Source
+_commit=staging
+source="
+	linux-xiaomi-capricorn-$_commit.tar.gz::https://gitlab.com/kschen202115/linux-6-11-rc-6/-/archive/msm8996-staging/linux-6-11-rc-6-msm8996-staging.tar.gz
+	config-$_flavor.$arch
+"
+builddir="$srcdir/linux-msm8996-staging"
+
+prepare() {
+	default_prepare
+	cp "$srcdir/config-$_flavor.$CARCH" .config
+}
+
+build() {
+	unset LDFLAGS
+	# V=1: workaround for pma#1990
+	make ARCH="$_carch" CC="${CC:-gcc}" \
+		KBUILD_BUILD_VERSION=$((pkgrel + 1 )) \
+		V=1
+}
+
+package() {
+	install -Dm644 "$builddir/arch/$_carch/boot/Image.gz" \
+		"$pkgdir/boot/vmlinuz"
+
+	install -D "$builddir/include/config/kernel.release" \
+		"$pkgdir/usr/share/kernel/$_flavor/kernel.release"
+
+	make modules_install dtbs_install \
+		ARCH="$_carch" \
+		INSTALL_MOD_PATH="$pkgdir" \
+		INSTALL_MOD_STRIP=1 \
+		INSTALL_DTBS_PATH="$pkgdir"/boot/dtbs
+}
+sha512sums=
