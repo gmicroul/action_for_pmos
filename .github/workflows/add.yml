@@ -48,6 +48,8 @@ jobs:
         run: |
           cd ..
           echo -e "\n\n\n\n\n\n\n\n\n\n\n\n\n" |  pmbootstrap init
+          pwd
+          ls -al
           cp -r test/* /home/runner/.local/var/pmbootstrap/cache_git/pmaports/device/testing/
           echo -e "\n${{ github.event.inputs.set_Channel }}\n${{ github.event.inputs.set_Device }}\n${{ github.event.inputs.set_code }}\n\nwpa_supplicant\n${{ github.event.inputs.set_ui }}\n\n\n\n\n\n\n\n" |  pmbootstrap init
           echo "###################"
@@ -71,11 +73,11 @@ jobs:
           pmbootstrap export
           zip_path=$(readlink -f /tmp/postmarketOS-export/pmos-*.zip)
           echo "Zip path: $zip_path"
-          echo "::set-output name=zip_path::$zip_path"
+          echo "zip_path=$zip_path" >> $GITHUB_ENV
         id: get_zip_path
           
       - name: Upload zip
         uses: actions/upload-artifact@v3
         with:
           name: pmos-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }}-${{ github.event.inputs.set_ui }}
-          path: ${{ steps.get_zip_path.outputs.zip_path }}
+          path: ${{ env.zip_path }}
