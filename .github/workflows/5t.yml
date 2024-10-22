@@ -1,0 +1,95 @@
+name: Build pmos edite(port)
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      set_Channel:
+        description: "Channel"
+        required: true
+        default: "edge"
+      set_Device:
+        description: "Device"
+        required: true
+        default: "xiaomi"
+      set_code:
+        description: "code"
+        required: true
+        default: "capricorn"
+      set_ui:
+        description: "ui"
+        required: true
+        default: "console"
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - name: Cleanup Disk
+        uses: HandsomeYingyan/cleanup-disk-action@v3.0
+      
+      - name: Installation pmbootstrap
+        run: |
+          
+          sudo apt update
+          sudo apt install git python3 python3-tomli
+          git clone https://gitlab.com/postmarketOS/pmbootstrap.git
+          cd pmbootstrap
+          git checkout 2.3.x
+          
+          mkdir -p ~/.local/bin
+          ln -s "$PWD/pmbootstrap.py" ~/.local/bin/pmbootstrap
+          PATH="$HOME/.local/bin:$PATH"
+          pmbootstrap --version
+      - name: init
+        run: |
+          echo -e "\n\n\n\n\n\n\n\n\n\n\n\n\n" |  pmbootstrap init
+          pwd
+          ls -al
+          cp -r test/* /home/runner/.local/var/pmbootstrap/cache_git/pmaports/device/testing/
+          pmbootstrap zap -p
+          echo -e "\n${{ github.event.inputs.set_Channel }}\n${{ github.event.inputs.set_Device }}\n${{ github.event.inputs.set_code }}\n\nwpa_supplicant\n${{ github.event.inputs.set_ui }}\n\n\n\n\n\n\n\n" |  pmbootstrap init
+          echo "###################"
+
+          echo "###################"
+
+          echo "###################"
+
+          pmbootstrap pull
+          
+      - name: build
+        run: |
+          pmbootstrap checksum linux-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }}
+          pmbootstrap checksum device-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }}
+          pmbootstrap build linux-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }} --force
+          pmbootstrap build device-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }} --force
+          echo -e "1234\n1234\n" | pmbootstrap install --android-recovery-zip --recovery-install-partition=data
+          # <<EOF
+
+          # # 1234
+          # # 1234
+          # # EOF
+          pmbootstrap export
+          zip_path=$(readlink -f /tmp/postmarketOS-export/pmos-*.zip)
+          echo "Zip path: $zip_path"
+          echo "zip_path=$zip_path" >> $GITHUB_ENV
+        id: get_zip_path
+         
+      - name: Upload zip
+        uses: actions/upload-artifact@v3
+        with:
+          name: pmos-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }}-${{ github.event.inputs.set_ui }}
+          path: ${{ env.zip_path }}
+
+      - name: Upload log
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: log
+          path:  /home/runner/.local/var/pmbootstrap/log.txt
