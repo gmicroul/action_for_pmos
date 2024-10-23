@@ -1,0 +1,41 @@
+name: Build Archlinux with kupferbootstrap for oneplus-fajita
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      set_flavour:
+        description: "flavour"
+        required: true
+        default: "phosh"
+  
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - name: Cleanup Disk
+        uses: HandsomeYingyan/cleanup-disk-action@v3.0
+
+      - name: Installation nix git
+        run: |
+          
+          sudo apt update
+          sudo apt install git nix
+          
+          
+
+      - name: nix-build
+        run: |
+          git clone https://github.com/gmicroul/kupferbootstrap.git
+          cd kupferbootstrap
+          df -h /
+          pwd
+          ls -ltr
+          
