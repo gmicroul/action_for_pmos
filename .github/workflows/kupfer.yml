@@ -23,15 +23,15 @@ jobs:
       - name: Cleanup Disk
         uses: HandsomeYingyan/cleanup-disk-action@v3.0
 
-      - name: Installation nix git
+      - name: Installation kupferbootstrap git
         run: |
           
           sudo apt update
-          sudo apt install git nix
+          sudo apt install git kupferbootstrap
           
           
 
-      - name: nix-build
+      - name: kupferbootstrap-build
         run: |
           git clone https://github.com/gmicroul/kupferbootstrap.git
           cd kupferbootstrap
