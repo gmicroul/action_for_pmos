@@ -34,7 +34,13 @@ jobs:
             uname -a
             echo ::set-output name=uname::$(uname -a)
             pacman -Sy
-            pacman -S python docker git --needed --noconfirm
+            pacman -S python docker docker-buildx git --needed --noconfirm
+            usermod -aG docker "$(whoami)"
+            git clone -b dev https://gitlab.com/kupfer/kupferbootstrap
+            cd kupferbootstrap
+            pip3 install -r requirements.txt
+            ln -s "$(pwd)/bin/kupferbootstrap" /usr/local/bin/
+            kupferbootstrap -V
 
       - name: Get the output
         # Echo the `uname` output parameter from the `runcmd` step
