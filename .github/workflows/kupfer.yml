@@ -33,6 +33,7 @@ jobs:
           run: |
             uname -a
             echo ::set-output name=uname::$(uname -a)
+            pacman -S python docker git --needed --noconfirm
 
       - name: Get the output
         # Echo the `uname` output parameter from the `runcmd` step
