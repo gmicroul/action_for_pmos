@@ -40,15 +40,27 @@ jobs:
           # export GC_INITIAL_HEAP_SIZE=12G
           # export GC_MAXIMUM_HEAP_SIZE=30G
           sudo nix-build examples/${{ github.event.inputs.set_example }}/ --argstr device oneplus-fajita -A outputs.android-fastboot-images
-          zip_path=$(readlink -f /nix/store/*/*.img)
-          echo "Zip path: $zip_path"
-          echo "::set-output name=zip_path::$zip_path"
-        id: get_zip_path
+          #zip_path=$(readlink -f /nix/store/*/*.img)
+          zip_path1=$(readlink -f /nix/store/*boot.img)
+          zip_path2=$(readlink -f /nix/store/*system.img)
+          #echo "Zip path: $zip_path"
+          echo "Zip path1: $zip_path1"
+          echo "Zip path2: $zip_path2"
+          #echo "::set-output name=zip_path::$zip_path"
+          echo "::set-output1 name=zip_path1::$zip_path1"
+          echo "::set-output2 name=zip_path2::$zip_path2"
+        #id: get_zip_path
+        id: get_zip_path1
+        id: get_zip_path2
           
       - name: Upload zip
         uses: actions/upload-artifact@v4
         with:
-          name: pmos-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }}-${{ github.event.inputs.set_ui }}
-          path: ${{ steps.get_zip_path.outputs.zip_path }}
+          #name: pmos-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }}-${{ github.event.inputs.set_ui }}
+          name: nixos-${{ github.event.inputs.set_Sample }}
+          #path: ${{ steps.get_zip_path.outputs.zip_path }}
+          path: ${{ steps.get_zip_path1.outputs.zip_path1 }}
+          path: ${{ steps.get_zip_path2.outputs.zip_path2 }}
+          
           
    
