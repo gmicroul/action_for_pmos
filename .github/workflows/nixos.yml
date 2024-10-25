@@ -50,8 +50,8 @@ jobs:
           echo "::set-output1 name=zip_path1::$zip_path1"
           echo "::set-output2 name=zip_path2::$zip_path2"
         #id: get_zip_path
-        id: get_zip_path1
-        id: get_zip_path2
+        id1: get_zip_path1
+        id2: get_zip_path2
           
       - name: Upload zip
         uses: actions/upload-artifact@v4
@@ -59,8 +59,8 @@ jobs:
           #name: pmos-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }}-${{ github.event.inputs.set_ui }}
           name: nixos-${{ github.event.inputs.set_Sample }}
           #path: ${{ steps.get_zip_path.outputs.zip_path }}
-          path: ${{ steps.get_zip_path1.outputs.zip_path1 }}
-          path: ${{ steps.get_zip_path2.outputs.zip_path2 }}
+          path1: ${{ steps.get_zip_path1.outputs.zip_path1 }}
+          path2: ${{ steps.get_zip_path2.outputs.zip_path2 }}
           
           
    
