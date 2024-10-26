@@ -36,6 +36,7 @@ jobs:
             pacman -Sy
             pacman -S python docker docker-buildx git glibc --needed --noconfirm
             echo "$(whoami)"
+            gpasswd -a $USER docker
             usermod -aG docker "$(whoami)"
             git clone -b dev https://gitlab.com/kupfer/kupferbootstrap
             cd kupferbootstrap
