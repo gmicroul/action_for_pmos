@@ -34,7 +34,7 @@ jobs:
             uname -a
             echo ::set-output name=uname::$(uname -a)
             pacman -Sy
-            pacman -S python docker docker-buildx git glibc--needed --noconfirm
+            pacman -S python docker docker-buildx git glibc --needed --noconfirm
             echo "$(whoami)"
             usermod -aG docker "$(whoami)"
             git clone -b dev https://gitlab.com/kupfer/kupferbootstrap
