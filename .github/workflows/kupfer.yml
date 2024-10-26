@@ -14,7 +14,7 @@ env:
 jobs:
   aarch64_job:
     # The host should always be Linux
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     name: Build on ubuntu-20.04 aarch64
     steps:
       - uses: actions/checkout@v4
@@ -34,7 +34,7 @@ jobs:
             uname -a
             echo ::set-output name=uname::$(uname -a)
             pacman -Sy
-            pacman -S python docker docker-buildx git --needed --noconfirm
+            pacman -S python docker docker-buildx git glibc--needed --noconfirm
             echo "$(whoami)"
             usermod -aG docker "$(whoami)"
             git clone -b dev https://gitlab.com/kupfer/kupferbootstrap
