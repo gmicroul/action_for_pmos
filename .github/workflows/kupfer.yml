@@ -22,8 +22,8 @@ jobs:
         name: Run commands
         id: runcmd
         with:
-          arch: aarch64
-          distro: archarm_latest
+          arch: amd64
+          distro: archlinux_latest
 
           # Not required, but speeds up builds by storing container images in
           # a GitHub package registry.
@@ -36,7 +36,6 @@ jobs:
             pacman -Sy
             pacman -S python docker docker-buildx git glibc --needed --noconfirm
             echo "$(whoami)"
-            gpasswd -a "$(whoami)" docker
             usermod -aG docker "$(whoami)"
             git clone -b dev https://gitlab.com/kupfer/kupferbootstrap
             cd kupferbootstrap
