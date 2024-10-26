@@ -50,7 +50,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           #name: pmos-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }}-${{ github.event.inputs.set_ui }}
-          name: nixos-${{ github.event.inputs.set_Sample }}
+          name: nixos-${{ github.event.inputs.set_example }}
           path: ${{ steps.get_zip_path.outputs.zip_path }}
 
           
