@@ -43,7 +43,7 @@ jobs:
           zip_path=$(readlink -f /nix/store/*android-fastboot-images-oneplus-fajita*.img)
           echo "Zip path: $zip_path"
           echo "::set-output name=zip_path::$zip_path"
-       id: get_zip_path
+        id: get_zip_path
         
           
       - name: Upload zip
