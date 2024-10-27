@@ -1,0 +1,58 @@
+name: Build nixos-hkdm for oneplus-fajita
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      set_example:
+        description: "example"
+        required: true
+        default: "hkdm"
+  
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - name: Cleanup Disk
+        uses: HandsomeYingyan/cleanup-disk-action@v3.0
+
+      - name: Installation nix git
+        run: |
+          
+          sudo apt update
+          sudo apt install git nix
+          
+          
+
+      - name: nix-build
+        run: |
+          git clone https://github.com/gmicroul/mobile-nixos.git
+          cd mobile-nixos
+          pwd
+          ls -ltr
+          # export GC_INITIAL_HEAP_SIZE=12G
+          # export GC_MAXIMUM_HEAP_SIZE=30G
+          sudo nix-build examples/${{ github.event.inputs.set_example }}/ --argstr device oneplus-fajita -A outputs.android-fastboot-images
+          zip_path=$(readlink -f /nix/store/*android-fastboot-images-oneplus-fajita)
+          echo "Zip path: $zip_path"
+          echo "::set-output name=zip_path::$zip_path"
+        id: get_zip_path
+        
+          
+      - name: Upload zip
+        uses: actions/upload-artifact@v4
+        with:
+          #name: pmos-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }}-${{ github.event.inputs.set_ui }}
+          name: nixos-${{ github.event.inputs.set_example }}
+          path: ${{ steps.get_zip_path.outputs.zip_path }}/*
+
+          
+          
+   
