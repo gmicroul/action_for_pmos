@@ -6,7 +6,7 @@ on:
       set_example:
         description: "example"
         required: true
-        default: "phosh"
+        default: "hkdm"
   
 env:
   TZ: Asia/Shanghai
