@@ -37,9 +37,6 @@ jobs:
             pip3 install -r requirements.txt
             ln -s "$(pwd)/bin/kupferbootstrap" /usr/local/bin/
             kupferbootstrap --help
-
-        - name: kupferboostrap config init oneplus-fajita
-          run: |
             pwd
             kupferboostrap config init oneplus-fajita
             cat ~/.config/kupfer/kupferbootstrap.toml
