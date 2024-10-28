@@ -37,8 +37,8 @@ jobs:
             pip3 install -r requirements.txt
             ln -s "$(pwd)/bin/kupferbootstrap" /usr/local/bin/
             kupferbootstrap --help
-            systemctl start docker
-            systemctl status docker
+            service docker start
+            service docker status
             pwd
             wget https://github.com/gmicroul/action_for_pmos/raw/refs/heads/main/kupferbootstrap.toml
             kupferbootstrap config init -N
