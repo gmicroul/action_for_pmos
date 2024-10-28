@@ -24,7 +24,7 @@ jobs:
         shell: run-in-container.sh {0}
         run: |
           pacman -Sy
-          pacman -S git
+          pacman -S git nix
           git clone https://github.com/gmicroul/mobile-nixos.git
           cd mobile-nixos
           pwd
