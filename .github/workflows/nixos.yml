@@ -10,26 +10,24 @@ on:
   
 env:
   TZ: Asia/Shanghai
+  
 jobs:
   build:
     runs-on: ubuntu-latest
     if: github.event.repository.owner.id == github.event.sender.id
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      
-      - name: setup-qemu
-        uses: sandervocke/setup-qemu-container@v1
-          with:
-            container: archlinux
-            arch: arm64
-     # - name: Print architecture from within container
-     #   shell: run-in-container.sh {0}
+      - uses: sandervocke/setup-qemu-container@v1
+        with:
+          container: archlinux
+          arch: aarch64
+      - name: Print architecture from within container
+        shell: run-in-container.sh {0}
           
 
       - name: nix-build
         run: |
-          nix-env -iA nixos.git 
+          pacman -Sy
+          pacman -S git
           git clone https://github.com/gmicroul/mobile-nixos.git
           cd mobile-nixos
           pwd
