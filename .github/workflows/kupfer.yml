@@ -38,6 +38,8 @@ jobs:
             ln -s "$(pwd)/bin/kupferbootstrap" /usr/local/bin/
             kupferbootstrap --help
 
+        - name: kupferboostrap config init oneplus-fajita
+
         - name: Get the output
         # Echo the `uname` output parameter from the `runcmd` step
           run: |
