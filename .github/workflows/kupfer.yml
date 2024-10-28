@@ -11,31 +11,33 @@ on:
 env:
   TZ: Asia/Shanghai
 
+
 jobs:
-  runs-on: ubuntu-latest
-  steps:
-      - uses: sandervocke/setup-qemu-container@v1
-        with:
-          container: archlinux
-          arch: amd64
-      - name: Print architecture from within container
-        shell: run-in-container.sh {0}
+  build:
+    runs-on: ubuntu-latest
+    steps:
+        - uses: sandervocke/setup-qemu-container@v1
+          with:
+            container: archlinux
+            arch: amd64
+        - name: Print architecture from within container
+          shell: run-in-container.sh {0}
       
           # Set an output parameter `uname` for use in subsequent steps
-        run: |
-          uname -a
-          echo ::set-output name=uname::$(uname -a)
-          pacman -Sy
-          pacman -S python python-pip docker docker-buildx git glibc --needed --noconfirm
-          echo "whoami=$(whoami)"
-          usermod -aG docker "$(whoami)"
-          git clone -b dev https://gitlab.com/kupfer/kupferbootstrap
-          cd kupferbootstrap
-          pip3 install -r requirements.txt
-          ln -s "$(pwd)/bin/kupferbootstrap" /usr/local/bin/
-          kupferbootstrap -V
+          run: |
+            uname -a
+            echo ::set-output name=uname::$(uname -a)
+            pacman -Sy
+            pacman -S python python-pip docker docker-buildx git glibc --needed --noconfirm
+            echo "whoami=$(whoami)"
+            usermod -aG docker "$(whoami)"
+            git clone -b dev https://gitlab.com/kupfer/kupferbootstrap
+            cd kupferbootstrap
+            pip3 install -r requirements.txt
+            ln -s "$(pwd)/bin/kupferbootstrap" /usr/local/bin/
+            kupferbootstrap -V
 
-      - name: Get the output
+        - name: Get the output
         # Echo the `uname` output parameter from the `runcmd` step
-        run: |
-          echo "The uname output was ${{ steps.runcmd.outputs.uname }}"
+          run: |
+            echo "The uname output was ${{ steps.runcmd.outputs.uname }}"
