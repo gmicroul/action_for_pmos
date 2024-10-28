@@ -40,7 +40,7 @@ jobs:
             pwd
             wget https://github.com/gmicroul/action_for_pmos/raw/refs/heads/main/kupferbootstrap.toml
             kupferbootstrap config init -N
-            kupferbootstrap config profile init oneplus-fajita
+            kupferbootstrap config profile init
             cp -r kupferbootstrap.toml ~/.config/kupfer/kupferbootstrap.toml
             kupferbootstrap image build oneplus-fajita
 
