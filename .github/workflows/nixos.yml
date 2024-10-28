@@ -10,25 +10,20 @@ on:
   
 env:
   TZ: Asia/Shanghai
-
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     if: github.event.repository.owner.id == github.event.sender.id
-
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        
-      - name: Cleanup Disk
-        uses: HandsomeYingyan/cleanup-disk-action@v3.0
-
-      - name: Installation nix git
-        run: |
-          
-          sudo apt update
-          sudo apt install git nix
-          
+      - name: setup-qemu
+      - uses: sandervocke/setup-qemu-container@v1
+          with:
+            container: nixos
+            arch: aarch64
+      - name: Print architecture from within container
+        shell: run-in-container.sh {0}
           
 
       - name: nix-build
