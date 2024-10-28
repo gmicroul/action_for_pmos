@@ -39,9 +39,9 @@ jobs:
             kupferbootstrap --help
             pwd
             kupferbootstrap config init -N
-            kupferbootstrap config profile init 
+            kupferbootstrap config profile init default
             cat ~/.config/kupfer/kupferbootstrap.toml
-            kupferbootstrap image build oneplus-fajita
+            kupferbootstrap image build default
 
         - name: Get the output
         # Echo the `uname` output parameter from the `runcmd` step
