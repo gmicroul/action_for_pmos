@@ -18,8 +18,8 @@ jobs:
     steps:
       - uses: sandervocke/setup-qemu-container@v1
         with:
-          container: archlinuxarm
-          arch: aarch64
+          container: menci/archlinuxarm
+          arch: arm64
       - name: Print architecture from within container
         shell: run-in-container.sh {0}
         run: |
