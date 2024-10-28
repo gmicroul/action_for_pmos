@@ -14,21 +14,15 @@ env:
 jobs:
   aarch64_job:
     # The host should always be Linux
-    runs-on: ubuntu-24.04
-    name: Build on ubuntu-20.04 aarch64
+  runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: uraimo/run-on-arch-action@v2
-        name: Run commands
-        id: runcmd
-        with:
-          arch: aarch64
-          distro: archarm_latest
-
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          githubToken: ${{ github.token }}
-
+    - uses: sandervocke/setup-qemu-container@v1
+      with:
+        container: archlinux
+        arch: amd64
+    - name: Print architecture from within container
+      shell: run-in-container.sh {0}
+      
           # Set an output parameter `uname` for use in subsequent steps
           run: |
             uname -a
