@@ -39,7 +39,7 @@ jobs:
             kupferbootstrap --help
             pwd
             kupferbootstrap config init -N
-            kupferboostrap config init oneplus-fajita
+            kupferbootstrap config profile init oneplus-fajita
             cat .config/kupfer/kupferbootstrap.toml
             kupferbootstrap image build oneplus-fajita
 
