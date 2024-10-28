@@ -1,0 +1,49 @@
+[wrapper]
+type = "docker"
+
+[build]
+ccache = true
+clean_mode = true
+crosscompile = true
+crossdirect = true
+threads = 0
+
+[pkgbuilds]
+git_repo = "https://gitlab.com/kupfer/packages/pkgbuilds.git"
+git_branch = "dev"
+
+[pacman]
+parallel_downloads = 4
+repo_branch = "dev"
+
+[paths]
+cache_dir = "/home/dennis/.cache/kupfer"
+chroots = "%cache_dir%/chroots"
+pacman = "%cache_dir%/pacman"
+packages = "%cache_dir%/packages"
+pkgbuilds = "%cache_dir%/pkgbuilds"
+jumpdrive = "%cache_dir%/jumpdrive"
+images = "%cache_dir%/images"
+
+[profiles]
+current = "oneplus-fajita"
+
+[profiles.default]
+parent = ""
+device = ""
+flavour = "posh"
+pkgs_include = [ "wget", " rsync", " nano", " tmux", " zsh", " pv",]
+pkgs_exclude = []
+hostname = "6T"
+username = "user"
+password = "1234"
+size_extra_mb = "+3000"
+
+[profiles.oneplus-fajita]
+device = "oneplus-fajita"
+flavour = "posh"
+pkgs_include = [ "wget", " rsync", " nano", " tmux", " zsh", " pv",]
+hostname = "fajita"
+username = "user"
+password = "1234"
+size_extra_mb = "+3000"
