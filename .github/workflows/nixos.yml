@@ -21,8 +21,8 @@ jobs:
       - name: setup-qemu
         uses: sandervocke/setup-qemu-container@v1
           with:
-            container: nixos
-            arch: aarch64
+            container: archlinux
+            arch: arm64
      # - name: Print architecture from within container
      #   shell: run-in-container.sh {0}
           
