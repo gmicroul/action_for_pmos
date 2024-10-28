@@ -41,7 +41,8 @@ jobs:
         - name: kupferboostrap config init oneplus-fajita
           run: |
             pwd
-            cp ./kupferbootstrap.toml ~/.config/kupfer/kupferbootstrap.toml
+            kupferboostrap config init oneplus-fajita
+            cat ~/.config/kupfer/kupferbootstrap.toml
             kupferbootstrap image build oneplus-fajita
 
         - name: Get the output
