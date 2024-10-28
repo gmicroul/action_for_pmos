@@ -22,9 +22,6 @@ jobs:
           arch: arm64
       - name: Print architecture from within container
         shell: run-in-container.sh {0}
-          
-
-      - name: nix-build
         run: |
           pacman -Sy
           pacman -S git
