@@ -19,7 +19,7 @@ jobs:
       - uses: sandervocke/setup-qemu-container@v1
         with:
           container: archlinux
-          arch: aarch64
+          arch: arm64
       - name: Print architecture from within container
         shell: run-in-container.sh {0}
           
