@@ -36,7 +36,7 @@ jobs:
             cd kupferbootstrap
             pip3 install -r requirements.txt
             ln -s "$(pwd)/bin/kupferbootstrap" /usr/local/bin/
-            kupferbootstrap -V
+            kupferbootstrap --help
 
         - name: Get the output
         # Echo the `uname` output parameter from the `runcmd` step
