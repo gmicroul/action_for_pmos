@@ -38,6 +38,7 @@ jobs:
             ln -s "$(pwd)/bin/kupferbootstrap" /usr/local/bin/
             kupferbootstrap --help
             pwd
+            kupferbootstrap config init -N
             kupferboostrap config init oneplus-fajita
             cat .config/kupfer/kupferbootstrap.toml
             kupferbootstrap image build oneplus-fajita
