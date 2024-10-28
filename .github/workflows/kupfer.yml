@@ -14,14 +14,14 @@ env:
 jobs:
   aarch64_job:
     # The host should always be Linux
-  runs-on: ubuntu-latest
-    steps:
-    - uses: sandervocke/setup-qemu-container@v1
-      with:
-        container: archlinux
-        arch: amd64
-    - name: Print architecture from within container
-      shell: run-in-container.sh {0}
+    runs-on: ubuntu-latest
+      steps:
+        - uses: sandervocke/setup-qemu-container@v1
+        with:
+          container: archlinux
+          arch: amd64
+      - name: Print architecture from within container
+          shell: run-in-container.sh {0}
       
           # Set an output parameter `uname` for use in subsequent steps
           run: |
