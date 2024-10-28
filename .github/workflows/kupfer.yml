@@ -12,8 +12,6 @@ env:
   TZ: Asia/Shanghai
 
 jobs:
-  aarch64_job:
-    # The host should always be Linux
   runs-on: ubuntu-latest
   steps:
       - uses: sandervocke/setup-qemu-container@v1
