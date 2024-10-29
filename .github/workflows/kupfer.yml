@@ -22,7 +22,9 @@ jobs:
             arch: amd64
  #       - name: Print architecture from within container
  #         shell: run-in-container.sh {0}
-      
+            -
+        - name: Set up Docker Buildx
+          uses: docker/setup-buildx-action@v3
           # Set an output parameter `uname` for use in subsequent steps
           run: |
             uname -a
