@@ -35,8 +35,9 @@ jobs:
             #usermod -aG docker "$(whoami)"
             useradd -m -G wheel -s /bin/bash user
             su user
-            cd $HOME
-            echo $HOME
+            mkdir -p /home/user
+            cd /home/user
+            pwd
             git clone -b dev https://gitlab.com/kupfer/kupferbootstrap
             cd kupferbootstrap
             pip3 install -r requirements.txt
