@@ -47,10 +47,10 @@ jobs:
             $(pwd)/bin/kupferbootstrap --help
             pwd
             wget https://github.com/gmicroul/action_for_pmos/raw/refs/heads/main/kupferbootstrap.toml
-            $(pwd)/bin/kupferbootstrap config init -N
-            $(pwd)/bin/kupferbootstrap config profile init
+            ./bin/kupferbootstrap config init -N
+            ./bin/kupferbootstrap config profile init
             cp -r ./kupferbootstrap.toml ~/.config/kupfer/kupferbootstrap.toml
-            $(pwd)/bin/kupferbootstrap image build oneplus-fajita
+            ./bin/kupferbootstrap image build oneplus-fajita
 
         - name: Get the output
         # Echo the `uname` output parameter from the `runcmd` step
