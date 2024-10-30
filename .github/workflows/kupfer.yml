@@ -27,18 +27,19 @@ jobs:
           run: |
             uname -a
             echo ::set-output name=uname::$(uname -a)
-            useradd -m -G wheel -s /bin/bash user
-            su user
-            sudo pacman -Sy
+            pacman -Sy
             #pacman -S python python-pip docker docker-buildx git glibc wget --needed --noconfirm
-            sudo pacman -S python python-pip git glibc wget --needed --noconfirm
-            sudo rm /usr/lib/python3.12/EXTERNALLY-MANAGED
+            pacman -S python python-pip git glibc wget sudo --needed --noconfirm
+            rm /usr/lib/python3.12/EXTERNALLY-MANAGED
             echo "whoami=$(whoami)"
             #usermod -aG docker "$(whoami)"
+            useradd -m -G wheel -s /bin/bash user
+            su user
+            cd $HOME
             git clone -b dev https://gitlab.com/kupfer/kupferbootstrap
             cd kupferbootstrap
             pip3 install -r requirements.txt
-            ln -s "$(pwd)/bin/kupferbootstrap" /usr/local/bin/
+            sudo ln -s "$(pwd)/bin/kupferbootstrap" /usr/local/bin/
             kupferbootstrap --help
             pwd
             wget https://github.com/gmicroul/action_for_pmos/raw/refs/heads/main/kupferbootstrap.toml
