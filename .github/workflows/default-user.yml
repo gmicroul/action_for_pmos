@@ -1,0 +1,27 @@
+name: test-default-user
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      set_flavour:
+        description: "flavour"
+        required: true
+        default: "phosh"
+
+jobs:
+  configure:
+    runs-on: ubuntu-latest
+    outputs:
+      uid_gid: ${{ steps.get-user.outputs.uid_gid }}
+    steps:
+      - id: get-user
+        run: echo "::set-output name=uid_gid::$(id -u):$(id -g)"
+
+  clone-and-install:
+    needs: configure
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/vscode/devcontainers/base:ubuntu
+      options: --user ${{ needs.configure.outputs.uid_gid }}
+    steps:
+      - uses: actions/checkout@v2
