@@ -33,13 +33,11 @@ jobs:
             sudo rm /usr/lib/python3.12/EXTERNALLY-MANAGED
             useradd -m -G wheel -s /bin/bash dennis
             su - dennis
-            $HOME=/home/dennis
-            cd $HOME
+            echo "whoami=$(whoami)"
+            cd /home/dennis
             pwd
             echo "whoami=$(whoami)"
             #usermod -aG docker "$(whoami)"
-            cd $HOME
-            pwd
             git clone -b dev https://gitlab.com/kupfer/kupferbootstrap
             cd kupferbootstrap
             pip3 install -r requirements.txt
