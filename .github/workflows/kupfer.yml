@@ -27,16 +27,19 @@ jobs:
           run: |
             uname -a
             echo ::set-output name=uname::$(uname -a)
-            pacman -Sy
+            $HOME=/home/dennis
+            pwd
+            useradd -m -G wheel -s /bin/bash dennis
+            su dennis
+            sudo pacman -Sy
             #pacman -S python python-pip docker docker-buildx git glibc wget --needed --noconfirm
-            pacman -S python python-pip git glibc wget sudo --needed --noconfirm
-            rm /usr/lib/python3.12/EXTERNALLY-MANAGED
+            sudo pacman -S python python-pip git glibc wget sudo --needed --noconfirm
+            sudo rm /usr/lib/python3.12/EXTERNALLY-MANAGED
             echo "whoami=$(whoami)"
             #usermod -aG docker "$(whoami)"
-            useradd -m -G wheel -s /bin/bash user
-            su user
-            mkdir -p /home/user
-            cd /home/user
+           
+            
+            cd /home/dennis
             pwd
             git clone -b dev https://gitlab.com/kupfer/kupferbootstrap
             cd kupferbootstrap
