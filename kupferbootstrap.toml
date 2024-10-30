@@ -1,5 +1,6 @@
 [wrapper]
-type = "docker"
+type = "none"
+#type = "docker"
 
 [build]
 ccache = true
@@ -40,7 +41,7 @@ password = "1234"
 size_extra_mb = "+3000"
 
 [profiles.oneplus-fajita]
-device = "oneplus-fajita"
+device = "sdm845-oneplus-fajita"
 flavour = "posh"
 pkgs_include = [ "wget", " rsync", " nano", " tmux", " zsh", " pv",]
 hostname = "fajita"
