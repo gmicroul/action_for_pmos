@@ -44,12 +44,12 @@ jobs:
             cd kupferbootstrap
             pip3 install -r requirements.txt
             #sudo ln -s "$(pwd)/bin/kupferbootstrap" /usr/local/bin/
-            $(pwd)/bin/kupferbootstrap --help
+            bin/kupferbootstrap --help
             pwd
             wget https://github.com/gmicroul/action_for_pmos/raw/refs/heads/main/kupferbootstrap.toml
             bin/kupferbootstrap config init -N
             bin/kupferbootstrap config profile init
-            cp -r ./kupferbootstrap.toml ~/.config/kupfer/kupferbootstrap.toml
+            cp -r ./kupferbootstrap.toml /home/dennis/.config/kupfer/kupferbootstrap.toml
             bin/kupferbootstrap image build oneplus-fajita
 
         - name: Get the output
