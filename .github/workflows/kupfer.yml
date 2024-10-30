@@ -42,13 +42,13 @@ jobs:
             cd kupferbootstrap
             pip3 install -r requirements.txt
             sudo ln -s "$(pwd)/bin/kupferbootstrap" /usr/local/bin/
-            ./kupferbootstrap --help
+            kupferbootstrap --help
             pwd
             wget https://github.com/gmicroul/action_for_pmos/raw/refs/heads/main/kupferbootstrap.toml
-            ./kupferbootstrap config init -N
-            ./kupferbootstrap config profile init
+            kupferbootstrap config init -N
+            kupferbootstrap config profile init
             cp -r ./kupferbootstrap.toml /root/.config/kupfer/kupferbootstrap.toml
-            ./kupferbootstrap image build oneplus-fajita
+            kupferbootstrap image build oneplus-fajita
 
         - name: Get the output
         # Echo the `uname` output parameter from the `runcmd` step
