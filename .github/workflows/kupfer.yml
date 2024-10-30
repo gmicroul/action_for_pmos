@@ -13,54 +13,19 @@ env:
 
 
 jobs:
-  build:
+  configure:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-        working-directory: /home/runner/
-    if: github.event.repository.owner.id == github.event.sender.id
-
+    outputs:
+      uid_gid: ${{ steps.get-user.outputs.uid_gid }}
     steps:
-        - name: Checkout
-          uses: actions/checkout@v2
-         
-        - name: setup-qemu-container     
-          uses: sandervocke/setup-qemu-container@v1
-          with:
-             container: archlinux
-             arch: amd64
+      - id: get-user
+        run: echo "::set-output name=uid_gid::$(id -u):$(id -g)"
 
-
-        - name: Print architecture from within container
-          shell: run-in-container.sh {0}
-          run: |
-            uname -a
-            echo ::set-output name=uname::$(uname -a)
-            pacman -Sy
-            #pacman -S python python-pip docker docker-buildx git glibc wget --needed --noconfirm
-            pacman -S python python-pip git glibc wget sudo --needed --noconfirm
-            sudo rm /usr/lib/python3.12/EXTERNALLY-MANAGED
-            #useradd -m -G wheel -s /bin/bash dennis
-          
-            echo "whoami=$(whoami)"
-            #cd /home/dennis
-            pwd
-            #echo "whoami=$(whoami)"
-            #usermod -aG docker "$(whoami)"
-            git clone -b dev https://gitlab.com/kupfer/kupferbootstrap
-            cd kupferbootstrap
-            pip3 install -r requirements.txt
-            sudo ln -s "$(pwd)/bin/kupferbootstrap" /usr/local/bin/
-            kupferbootstrap --help
-            pwd
-            wget https://github.com/gmicroul/action_for_pmos/raw/refs/heads/main/kupferbootstrap.toml
-            kupferbootstrap config init -N
-            kupferbootstrap config profile init
-            cp -r ./kupferbootstrap.toml ~/.config/kupfer/kupferbootstrap.toml
-            kupferbootstrap image build oneplus-fajita
-
-        - name: Get the output
-        # Echo the `uname` output parameter from the `runcmd` step
-          run: |
-            echo "The uname output was ${{ steps.runcmd.outputs.uname }}"
+  clone-and-install:
+    needs: configure
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/vscode/devcontainers/base:archlinux
+      options: --user ${{ needs.configure.outputs.uid_gid }}
+    steps:
+      - uses: actions/checkout@v2
