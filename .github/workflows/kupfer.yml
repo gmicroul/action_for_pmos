@@ -32,7 +32,7 @@ jobs:
             pacman -S python python-pip git glibc wget sudo --needed --noconfirm
             sudo rm /usr/lib/python3.12/EXTERNALLY-MANAGED
             useradd -m -G wheel -s /bin/bash dennis
-            su dennis
+            su - dennis
             $HOME=/home/dennis
             cd $HOME
             pwd
