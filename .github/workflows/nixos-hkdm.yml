@@ -20,8 +20,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         
-      - name: Cleanup Disk
-        uses: HandsomeYingyan/cleanup-disk-action@v3.0
+      #- name: Cleanup Disk
+        #uses: HandsomeYingyan/cleanup-disk-action@v3.0
 
       - name: Installation nix git
         run: |
