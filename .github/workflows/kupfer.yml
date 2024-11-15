@@ -37,6 +37,7 @@ jobs:
           git clone -b dev https://gitlab.com/kupfer/kupferbootstrap
           cd kupferbootstrap
           pip3 install -r requirements.txt 
+          cat requirements.txt
           sudo ln -s "$(pwd)/bin/kupferbootstrap" /usr/local/bin/
           kupferbootstrap --help
           kupferbootstrap config init -N
