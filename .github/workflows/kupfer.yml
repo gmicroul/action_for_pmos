@@ -54,8 +54,7 @@ jobs:
           cp -r kupferbootstrap.toml /home/runner/.config/kupfer/kupferbootstrap.toml
           pwd
           ls -ltrh
-          sudo mkdir -p /home/dennis/
-          sudo chmod 750 /home/dennis/
+
           kupferbootstrap image build oneplus-fajita
           pwd
           ls -ltrh
