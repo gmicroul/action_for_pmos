@@ -25,7 +25,8 @@ jobs:
         run: |
           sudo apt update
           #sudo apt install python3 docker.io git
-          sudo apt install wget gcc-13 gcc-13-aarch64-linux-gnu
+          sudo apt search gcc
+          sudo apt install wget gcc gcc-aarch64-linux-gnu
           
           
           
