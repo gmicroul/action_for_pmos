@@ -55,7 +55,7 @@ jobs:
           pwd
           ls -ltrh
           
-          sudo kupferbootstrap image build oneplus-fajita
+          kupferbootstrap image build oneplus-fajita
           pwd
           ls -ltrh
           zip_path=$(readlink -f *-fajita)
