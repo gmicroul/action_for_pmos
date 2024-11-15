@@ -19,15 +19,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        
-      #- name: Cleanup Disk
-        #uses: HandsomeYingyan/cleanup-disk-action@v3.0
+      
 
       - name: Installation python3 docker.io git
         run: |
-          
+          sudo apt update
           #sudo apt install python3 docker.io git
-          sudo apt install gcc-13 gcc-13-aarch64-linux-gnu
+          sudo apt install wget gcc-13 gcc-13-aarch64-linux-gnu
           
           
           
@@ -38,11 +36,14 @@ jobs:
           git clone -b dev https://gitlab.com/kupfer/kupferbootstrap
           cd kupferbootstrap
           pip3 install -r requirements.txt --break-system-packages
+          kupferbootstrap config init -N
+          kupferbootstrap config profile init oneplus-fajita
+          wget https://github.com/gmicroul/action_for_pmos/raw/refs/heads/main/kupferbootstrap.toml
           pwd
-          ls -ltr
-          # export GC_INITIAL_HEAP_SIZE=12G
-          # export GC_MAXIMUM_HEAP_SIZE=30G
-          
+          ls -ltrh
+          kupferbootstrap image build oneplus-fajita
+          pwd
+          ls -ltrh
           zip_path=$(readlink -f *-fajita)
           echo "Zip path: $zip_path"
           echo "::set-output name=zip_path::$zip_path"
