@@ -39,6 +39,7 @@ jobs:
           cat requirements.txt
           rm requirements.txt
           wget https://github.com/gmicroul/action_for_pmos/raw/refs/heads/main/requirements.txt
+          python3 -m pip install coloredlogs
           pip3 install -r requirements.txt --break-system-packages
           
           sudo ln -s "$(pwd)/bin/kupferbootstrap" /usr/local/bin/
@@ -49,7 +50,7 @@ jobs:
           cp -r kupferbootstrap.toml /home/runner/.config/kupfer/kupferbootstrap.toml
           pwd
           ls -ltrh
-          python -m pip install coloredlogs
+          
           sudo kupferbootstrap image build oneplus-fajita
           pwd
           ls -ltrh
