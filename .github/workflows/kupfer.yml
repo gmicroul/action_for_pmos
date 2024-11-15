@@ -45,7 +45,7 @@ jobs:
           cp -r kupferbootstrap.toml /home/runner/.config/kupfer/kupferbootstrap.toml
           pwd
           ls -ltrh
-          kupferbootstrap image build oneplus-fajita
+          sudo kupferbootstrap image build oneplus-fajita
           pwd
           ls -ltrh
           zip_path=$(readlink -f *-fajita)
