@@ -1,31 +1,61 @@
-name: Build Archlinux with kupferbootstrap for oneplus-fajita
+name: Build nixos-hkdm for oneplus-fajita
 on:
   repository_dispatch:
   workflow_dispatch:
     inputs:
-      set_flavour:
-        description: "flavour"
+      set_example:
+        description: "sdm845-oneplus-fajita"
         required: true
-        default: "phosh"
+        default: "none"
   
 env:
   TZ: Asia/Shanghai
 
-
 jobs:
-  configure:
+  build:
     runs-on: ubuntu-latest
-    outputs:
-      uid_gid: ${{ steps.get-user.outputs.uid_gid }}
-    steps:
-      - id: get-user
-        run: echo "::set-output name=uid_gid::$(id -u):$(id -g)"
+    if: github.event.repository.owner.id == github.event.sender.id
 
-  clone-and-install:
-    needs: configure
-    runs-on: ubuntu-latest
-    container:
-      image: mcr.microsoft.com/vscode/devcontainers/base:ubuntu
-      options: --user ${{ needs.configure.outputs.uid_gid }}
     steps:
-      - uses: actions/checkout@v2       
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      #- name: Cleanup Disk
+        #uses: HandsomeYingyan/cleanup-disk-action@v3.0
+
+      - name: Installation python3 docker.io git
+        run: |
+          
+          sudo apt install python3 docker.io git
+          sudo apt install gcc-13 gcc-13-aarch64-linux-gnu
+          
+          
+          
+
+      - name: kupferbootstrap-build
+        run: |
+          sudo usermod -aG docker "$(whoami)"
+          git clone -b dev https://gitlab.com/kupfer/kupferbootstrap
+          cd kupferbootstrap
+          pip3 install -r requirements.txt --break-system-packages
+          pwd
+          ls -ltr
+          # export GC_INITIAL_HEAP_SIZE=12G
+          # export GC_MAXIMUM_HEAP_SIZE=30G
+          
+          zip_path=$(readlink -f *-fajita)
+          echo "Zip path: $zip_path"
+          echo "::set-output name=zip_path::$zip_path"
+        id: get_zip_path
+        
+          
+      - name: Upload zip
+        uses: actions/upload-artifact@v4
+        with:
+          #name: pmos-${{ github.event.inputs.set_Device }}-${{ github.event.inputs.set_code }}-${{ github.event.inputs.set_ui }}
+          name: nixos-${{ github.event.inputs.set_example }}
+          path: ${{ steps.get_zip_path.outputs.zip_path }}/*
+
+          
+          
+   
