@@ -45,6 +45,7 @@ jobs:
           cp -r kupferbootstrap.toml /home/runner/.config/kupfer/kupferbootstrap.toml
           pwd
           ls -ltrh
+          python -m pip install coloredlogs
           sudo kupferbootstrap image build oneplus-fajita
           pwd
           ls -ltrh
