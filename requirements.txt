@@ -1,0 +1,11 @@
+click>=8.0.1
+appdirs>=1.4.4
+joblib>=1.0.1
+toml
+typing_extensions
+munch
+setuptools # required by munch
+requests
+python-dateutil
+enlighten
+PyYAML
