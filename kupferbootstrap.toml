@@ -18,7 +18,7 @@ parallel_downloads = 4
 repo_branch = "dev"
 
 [paths]
-cache_dir = "/home/dennis/.cache/kupfer"
+cache_dir = "/home/runner/.cache/kupfer"
 chroots = "%cache_dir%/chroots"
 pacman = "%cache_dir%/pacman"
 packages = "%cache_dir%/packages"
