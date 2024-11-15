@@ -39,8 +39,8 @@ jobs:
           cat requirements.txt
           #rm requirements.txt
           #wget https://github.com/gmicroul/action_for_pmos/raw/refs/heads/main/requirements.txt
-          pip install --upgrade pip
-          #python -m pip install coloredlogs
+          
+          python -m pip install coloredlogs
           pip3 install -r requirements.txt --break-system-packages
           
           sudo ln -s "$(pwd)/bin/kupferbootstrap" /usr/local/bin/
