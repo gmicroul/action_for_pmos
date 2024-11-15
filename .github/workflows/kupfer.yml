@@ -44,6 +44,8 @@ jobs:
           pip3 install -r requirements.txt --break-system-packages
           
           sudo ln -s "$(pwd)/bin/kupferbootstrap" /usr/local/bin/
+          pwd
+          ls -ltrh
           kupferbootstrap --help
           kupferbootstrap config init -N
           #kupferbootstrap config profile init 
