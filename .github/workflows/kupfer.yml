@@ -37,6 +37,8 @@ jobs:
           git clone -b dev https://gitlab.com/kupfer/kupferbootstrap
           cd kupferbootstrap
           pip3 install -r requirements.txt 
+          sudo ln -s "$(pwd)/bin/kupferbootstrap" /usr/local/bin/
+          kupferbootstrap --help
           kupferbootstrap config init -N
           kupferbootstrap config profile init oneplus-fajita
           wget https://github.com/gmicroul/action_for_pmos/raw/refs/heads/main/kupferbootstrap.toml
