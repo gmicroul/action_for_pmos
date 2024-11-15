@@ -26,7 +26,7 @@ jobs:
       - name: Installation python3 docker.io git
         run: |
           
-          sudo apt install python3 docker.io git
+          #sudo apt install python3 docker.io git
           sudo apt install gcc-13 gcc-13-aarch64-linux-gnu
           
           
