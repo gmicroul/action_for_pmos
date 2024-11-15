@@ -39,10 +39,10 @@ jobs:
           cat requirements.txt
 
           
-          python -m pip install coloredlogs
+          #python -m pip install coloredlogs
 
           
-          pip3 install -r requirements.txt --break-system-packages
+          pip3 install -r requirements.txt
           
           sudo ln -s "$(pwd)/bin/kupferbootstrap" /usr/local/bin/
           pwd
