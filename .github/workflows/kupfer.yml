@@ -21,10 +21,10 @@ jobs:
         uses: actions/checkout@v2
       
 
-      - name: Installation python3 docker.io git
+      - name: Installation python3  git
         run: |
           sudo apt update
-          sudo apt install python3 docker.io git
+          sudo apt install python3  git
           sudo apt search gcc12
           sudo apt install wget gcc-12 gcc-12-aarch64-linux-gnu
           
