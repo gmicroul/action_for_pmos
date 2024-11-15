@@ -1,4 +1,4 @@
-name: Build nixos-hkdm for oneplus-fajita
+name: Build archlinux with kupfer for sdm845-oneplus-fajita
 on:
   repository_dispatch:
   workflow_dispatch:
