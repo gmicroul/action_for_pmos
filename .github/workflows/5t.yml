@@ -15,6 +15,10 @@ on:
         description: "code"
         required: true
         default: "dumpling"
+      set_kernel:
+        description: "kernel"
+        required: true
+        default: "mainline"        
       set_ui:
         description: "ui"
         required: true
