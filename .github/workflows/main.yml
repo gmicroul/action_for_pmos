@@ -40,9 +40,9 @@ jobs:
           
           sudo apt update
           sudo apt install git 
-          git clone https://gitlab.com/postmarketOS/pmbootstrap.git
+          git clone https://gitlab.postmarketos.org/postmarketOS/pmbootstrap.git
           cd pmbootstrap
-          git checkout 2.3.x
+          git checkout 3.0.0
           
           mkdir -p ~/.local/bin
           ln -s "$PWD/pmbootstrap.py" ~/.local/bin/pmbootstrap
