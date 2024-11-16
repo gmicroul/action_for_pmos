@@ -10,15 +10,15 @@ on:
       set_Device:
         description: "Device"
         required: true
-        default: "xiaomi"
+        default: "oneplus"
       set_code:
         description: "code"
         required: true
-        default: "capricorn"
+        default: "dumpling"
       set_ui:
         description: "ui"
         required: true
-        default: "console"
+        default: "phosh"
 env:
   TZ: Asia/Shanghai
 
