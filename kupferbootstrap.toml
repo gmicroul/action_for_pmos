@@ -1,6 +1,6 @@
 [wrapper]
-type = "none"
-#type = "docker"
+#type = "none"
+type = "docker"
 
 [build]
 ccache = true
