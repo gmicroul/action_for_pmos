@@ -28,7 +28,7 @@ jobs:
           sudo mkdir -p /media/ramdisk/mpv-build
           sudo mkdir -p /home/pintcat/ubin
           sudo apt update
-          sudo apt install -y meson libfreetype6-dev libfreetype-dev libfribidi-dev libharfbuzz-dev fontconfig
+          sudo apt install -y meson libfreetype6-dev libfreetype-dev libfribidi-dev libharfbuzz-dev fontconfig-config
 
           export CROSS_COMPILE=aarch64-linux-gnu-
           export ARCH=arm64
