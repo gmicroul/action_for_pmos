@@ -30,7 +30,7 @@ jobs:
           sudo apt update
           sudo apt install -y meson ninja-build yasm autoconf autoconf-archive libtool pkgconf pkg-config python3-docutils spirv-cross wayland-protocols debhelper-compat libfreetype-dev libfribidi-dev libharfbuzz-dev libfontconfig-dev libjpeg-dev libx11-dev libarchive-dev libasound2-dev libass-dev libavcodec-dev libavdevice-dev libavfilter-dev libavformat-dev libavutil-dev libbluray-dev libcaca-dev libcdio-dev libcdio-paranoia-dev libdrm-dev libdvdnav-dev libegl-dev libffmpeg-nvenc-dev libgbm-dev libgl-dev libjack-dev liblcms2-dev liblua5.2-dev libmujs-dev libpipewire-0.3-dev libplacebo-dev libpulse-dev librubberband-dev libsdl2-dev libsixel-dev libspirv-cross-c-shared-dev libswscale-dev libuchardet-dev libva-dev libvdpau-dev libvulkan-dev libwayland-dev libxinerama-dev libxkbcommon-dev libxpresent-dev libxrandr-dev libxss-dev libxv-dev libzimg-dev
           export CROSS_COMPILE=aarch64-linux-gnu-
-          export ARCH=arm64
+          export ARCH=aarch64
           sudo sh do-mpv.sh
           pwd
           ls -ltrh
