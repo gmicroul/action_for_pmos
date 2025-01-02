@@ -45,6 +45,17 @@ jobs:
           name: nixos-${{ github.event.inputs.set_example }}
           path: ${{ steps.get_zip_path.outputs.zip_path }}/*
 
+      - name: Upload image to Release
+        if: ${{ success() }}
+        uses: ncipollo/release-action@main
+        with:
+          tag: oneplus-fajita
+          artifacts: ${{ steps.get_zip_path.outputs.zip_path }}/*.zip
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body: |
+            This is NixOS for Oneplus fajita
+
           
           
    
