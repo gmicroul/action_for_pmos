@@ -13,18 +13,17 @@ env:
   
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     if: github.event.repository.owner.id == github.event.sender.id
     steps:
-      - uses: sandervocke/setup-qemu-container@v1
-        with:
-          container: menci/archlinuxarm
-          arch: arm64
-      - name: Print architecture from within container
-        shell: run-in-container.sh {0}
+      #- uses: sandervocke/setup-qemu-container@v1
+      #  with:
+      #    container: menci/archlinuxarm
+      #    arch: arm64
+      - name: run build
+
         run: |
-          pacman -Sy
-          pacman -S git nix
+          apt install -y nix
           git clone https://github.com/gmicroul/mobile-nixos.git
           cd mobile-nixos
           pwd
