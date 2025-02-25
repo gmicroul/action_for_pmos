@@ -23,7 +23,7 @@ jobs:
       - name: run build
 
         run: |
-          apt install -y nix
+          sudo apt install -y nix
           git clone https://github.com/gmicroul/mobile-nixos.git
           cd mobile-nixos
           pwd
