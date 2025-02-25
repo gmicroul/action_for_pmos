@@ -31,7 +31,7 @@ jobs:
           # export GC_INITIAL_HEAP_SIZE=12G
           # export GC_MAXIMUM_HEAP_SIZE=30G
           export NIXPKGS_ALLOW_UNFREE=1
-          sudo nix-build examples/${{ github.event.inputs.set_example }}/ --argstr device oneplus-fajita -A outputs.android-fastboot-images
+          nix-build examples/${{ github.event.inputs.set_example }}/ --argstr device oneplus-fajita -A outputs.android-fastboot-images
           zip_path=$(readlink -f /nix/store/*android-fastboot-images-oneplus-fajita)
           echo "Zip path: $zip_path"
           echo "::set-output name=zip_path::$zip_path"
