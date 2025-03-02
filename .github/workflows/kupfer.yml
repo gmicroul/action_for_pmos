@@ -49,9 +49,10 @@ jobs:
           ls -ltrh
           kupferbootstrap --help
           kupferbootstrap config init -N
-          kupferbootstrap config profile init 
+          #kupferbootstrap config profile init 
           wget https://github.com/gmicroul/action_for_pmos/raw/refs/heads/main/kupferbootstrap.toml
           cp -r kupferbootstrap.toml /home/runner/.config/kupfer/kupferbootstrap.toml
+          cat /home/runner/.config/kupfer/kupferbootstrap.toml
           pwd
           ls -ltrh
 
