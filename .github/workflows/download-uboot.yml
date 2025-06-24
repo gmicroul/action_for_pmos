@@ -1,5 +1,5 @@
 
-name: Download fedora oneplus6t
+name: Download oneplus6t uboot
 on:
   repository_dispatch:
   workflow_dispatch:
@@ -7,7 +7,7 @@ on:
       set_git_repo:
         description: "aarch64"
         required: true
-        default: "fedora"
+        default: "uboot"
 
 
 env:
