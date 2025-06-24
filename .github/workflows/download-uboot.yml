@@ -1,0 +1,50 @@
+
+name: Download fedora oneplus6t
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      set_git_repo:
+        description: "aarch64"
+        required: true
+        default: "fedora"
+
+
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - name: Compile
+        id: compile
+        run: |
+          curl -LO "https://github.com/fedora-remix-mobility/u-boot/releases/download/fedora-mobility-v0.0.1/uboot-sdm845-oneplus-fajita.img"
+          pwd
+          ls -ltrh
+          
+          echo "::set-output name=status::success"
+          
+
+      - name: Upload file
+        uses: actions/upload-artifact@v4
+        with:
+          name: uboot-sdm845-oneplus-fajita
+          path: ./*.img
+
+      - name: Upload image to Release
+        uses: ncipollo/release-action@main
+        if: steps.compile.outputs.status == 'success' && !cancelled()
+        with:
+          tag: uboot-sdm845-oneplus-fajita_${{ env.COMPILE_STARTINGTIME }}
+          artifacts: ./*.img
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body: |
+            This is Fedora-SDM845-Remix_${{ env.LINUX_GITURL }}
