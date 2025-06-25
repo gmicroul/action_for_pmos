@@ -25,7 +25,7 @@ jobs:
       - name: Compile
         id: compile
         run: |
-          curl -LO "hhttps://images.postmarketos.org/bpo/v25.06/oneplus-fajita/phosh/20250621-1248/20250621-1248-postmarketOS-v25.06-phosh-25-oneplus-fajita.img.xz"
+          curl -LO "https://images.postmarketos.org/bpo/v25.06/oneplus-fajita/phosh/20250621-1248/20250621-1248-postmarketOS-v25.06-phosh-25-oneplus-fajita.img.xz"
           pwd
           ls -ltrh
           
