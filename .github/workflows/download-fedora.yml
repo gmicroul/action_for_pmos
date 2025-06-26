@@ -37,14 +37,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Fedora-SDM845-Remix
-          path: ./*.tar.xz
+          path: ./*.zip
 
       - name: Upload image to Release
         uses: ncipollo/release-action@main
         if: steps.compile.outputs.status == 'success' && !cancelled()
         with:
           tag: Fedora-SDM845-Remix_${{ env.COMPILE_STARTINGTIME }}
-          artifacts: ./*.tar.xz
+          artifacts: ./*.zip
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
