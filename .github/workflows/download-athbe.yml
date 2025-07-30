@@ -37,7 +37,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: sdm845.config
-          path: ./*.zip
+          path: ./*.config
 
       - name: Upload image to Release
         uses: ncipollo/release-action@main
