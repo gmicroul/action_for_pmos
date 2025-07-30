@@ -1,0 +1,51 @@
+
+name: Download athbe files
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      set_git_repo:
+        description: "aarch64"
+        required: true
+        default: "athbe"
+
+
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - name: Compile
+        id: compile
+        run: |
+          #curl -LO "https://github.com/fedora-remix-mobility/fedora-kiwi-descriptions/releases/download/2025-04-04/Fedora-SDM845-Remix.tar.xz"
+          curl -LO "https://cloud.athbe.cn/f/D3Uq/sdm845.config"
+          pwd
+          ls -ltrh
+          
+          echo "::set-output name=status::success"
+          
+
+      - name: Upload file
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdm845.config
+          path: ./*.zip
+
+      - name: Upload image to Release
+        uses: ncipollo/release-action@main
+        if: steps.compile.outputs.status == 'success' && !cancelled()
+        with:
+          tag: sdm845.config_${{ env.COMPILE_STARTINGTIME }}
+          artifacts: ./*.zip
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body: |
+            This is sdm845.config_${{ env.LINUX_GITURL }}
