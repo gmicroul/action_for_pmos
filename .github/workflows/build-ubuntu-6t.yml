@@ -35,11 +35,53 @@ jobs:
       # ------------------------------------------------------------------
       - name: Install tty console service
         run: |
-          wget https://cloud.athbe.cn/f/7BHR/ttygs0-console.sh
+          curl -O https://cloud.athbe.cn/f/7BHR/ttygs0-console.sh
           #wget -O ttygs0-console.sh ${{ env.TTY_SCRIPT }}
           sudo chmod +x ttygs0-console.sh
           sudo mv ttygs0-console.sh /usr/local/bin/
           sudo tee ubuntu/etc/systemd/system/oneplus6t-console.service >/dev/null <<'EOF'
           [Unit]
           Description=OnePlus6T USB Console Service
-         
+          After=syslog.target systemd-modules-load.service systemd-udevd.service
+          Wants=systemd-modules-load.service systemd-udevd.service
+
+          [Service]
+          Type=simple
+          ExecStart=/usr/local/bin/ttygs0-console.sh
+          Restart=always
+          RestartSec=10
+          StandardOutput=syslog
+          StandardError=syslog
+          SyslogIdentifier=oneplus6t-console
+
+          [Install]
+          WantedBy=multi-user.target
+          EOF
+
+      - name: Install shutdown-modem service
+        run: |
+          sudo tee ubuntu/etc/systemd/system/shutdown-modem.service >/dev/null <<'EOF'
+          [Unit]
+          Description=Poweroff modem remoteproc to prevent wlan fw crash
+          DefaultDependencies=no
+          Before=shutdown.target
+
+          [Service]
+          Type=oneshot
+          ExecStart=echo stop | tee /sys/class/remoteproc/remoteproc*/state
+
+          [Install]
+          WantedBy=shutdown.target
+          EOF
+
+      # ------------------------------------------------------------------
+      # 其它步骤保持原样（例如 Build kernel, Build initrd, Build boot.img,
+      # Create rootfs, etc.）----------------------------------------------
+      # ------------------------------------------------------------------
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: boot-rootfs
+          path: |
+            boot.img
+            rootfs.img
