@@ -1,48 +1,195 @@
-name: Build OnePlus 6T (Ubuntu Jammy)
+# .github/workflows/build-boot-image.yml
+name: Build OnePlus6T (boot + rootfs)
 
+# 你可以按需更改触发方式
 on:
+  workflow_dispatch:          # 手动触发
   push:
-    branches: [ main ]
-  workflow_dispatch:
+    branches: [ main ]        # 也可以配合 PR/Push 自动触发
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-22.04     # GitHub Actions 自带的 Ubuntu 22.04 runner
     env:
-      KERNEL_DIR: linux-sdm845-6.16-845
-      CONFIG_FILE: .config
-      KERNEL_IMAGE: vmlinux
-      MODULES_DIR: modules
-      MODULES_DIR_UBUNTU: modules-ubuntu
-      IMAGE_DIR: images
-      INITRAMFS: initrd.img
+      # 下面的 URL 你可以按需修改
+      KERNEL_REPO:   https://gitlab.com/sdm845-mainline/linux.git
+      KERNEL_BRANCH: sdm845-6.16-rc2-4
+      CONFIG_URL:    https://cloud.athbe.cn/f/D3Uq/sdm845.config
+      CHECK_SCRIPT:  https://cloud.athbe.cn/f/2MTG/check.sh
+      DTB_URL:       https://cloud.athbe.cn/f/WEhm/OnePlus6T.dtb
+      INITRD_REPO:   https://gitlab.com/sdm845-mainline/initrd.git
+      UBUNTU_BASE:   https://cdimage.ubuntu.com/ubuntu-base/releases/25.04/release/ubuntu-base-25.04-base-arm64.tar.gz
+      FIRMWARE_URL:  https://cloud.athbe.cn/f/6nSr/firmware.tar.gz
+      QRTR_ZIP:      https://cloud.athbe.cn/f/mJuG/qrtr%2Ctqftpserv%2Crmtfs%2Cpd-mapper.zip
+      TTY_SCRIPT:    https://cloud.athbe.cn/f/7BHR/ttygs0-console.sh
+      BOOTMAC_REPO:  https://gitlab.postmarketos.org/postmarketOS/bootmac.git
+      # 下面的缓存 key 用来加速多次构建
+      CACHE_KEY: ${{ runner.os }}-bootimage-${{ github.sha }}
+
     steps:
-      - name: Checkout repo
+      # --------------------------------------------------------------------
+      # 0. 代码检出
+      # --------------------------------------------------------------------
+      - name: Checkout repository
         uses: actions/checkout@v4
 
+      # --------------------------------------------------------------------
+      # 1. 安装编译、打包工具
+      # --------------------------------------------------------------------
       - name: Install build dependencies
         run: |
-          sudo apt-get update -y
-          sudo apt-get install -y git make gcc-arm-linux-gnueabihf bc kmod \
-            libssl-dev libelf-dev cpio flex bison bc wget rsync unzip \
-            python3 python3-pip libncurses5-dev libncursesw5-dev gnupg2 \
-            pkg-config libssl-dev libelf-dev libncurses5-dev libncursesw5-dev \
-            libudev-dev libsystemd-dev libudev-dev libusb-1.0-0-dev \
-            libudev-dev libsystemd-dev libudev-dev
+          apt-get update -y
+          apt-get install -y --no-install-recommends \
+            git wget make bc gcc-aarch64-linux-gnu \
+            libssl-dev libelf-dev flex bison libncurses5-dev \
+            libncursesw5-dev \
+            minizip liblz4-tool \
+            rsync dpkg dpkg-dev debhelper \
+            arch-install-scripts qemu-user-static \
+            android-platform-system-core mkbootimg \
+            ca-certificates dialog locales nano apt-utils \
+            net-tools network-manager iputils-ping bash-completion \
+            busybox-initramfs cpio initramfs-tools initramfs-tools-bin initramfs-tools-core \
+            linux-base netplan.io git ntp systemd-resolved \
+            ubuntu-desktop gnupg2
 
-      # ------------------------------------------------------------------
-      # 这里的所有 `run:` 语句都是 shell 脚本，保持不变，下面仅修正 heredoc
-      # ------------------------------------------------------------------
+      # --------------------------------------------------------------------
+      # 2. 克隆并编译内核
+      # --------------------------------------------------------------------
+      - name: Cache kernel source
+        uses: actions/cache@v4
+        with:
+          path: linux-sdm845-6.16-rc2-4
+          key: ${{ env.CACHE_KEY }}-kernel
+          restore-keys: ${{ env.CACHE_KEY }}-kernel
+
+      - name: Clone kernel
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          git clone --branch ${{ env.KERNEL_BRANCH }} --depth 1 ${{ env.KERNEL_REPO }} linux-sdm845-6.16-rc2-4
+
+      - name: Prepare kernel config
+        run: |
+          wget -O sdm845.config ${{ env.CONFIG_URL }}
+          wget -O check.sh ${{ env.CHECK_SCRIPT }}
+          chmod +x check.sh
+          ./check.sh sdm845.config -w
+          mv sdm845.config linux-sdm845-6.16-rc2-4/.config
+
+      - name: Enable serial gadget (ttyGS0)
+        run: |
+          sed -i 's/# CONFIG_USB_SERIAL_GADGET is not set/CONFIG_USB_SERIAL_GADGET=y/' linux-sdm845-6.16-rc2-4/.config
+          sed -i 's/# CONFIG_USB_SERIAL_TEGRA is not set/CONFIG_USB_SERIAL_TEGRA=y/' linux-sdm845-6.16-rc2-4/.config
+
+      - name: Build kernel
+        run: |
+          make -C linux-sdm845-6.16-rc2-4 O=out ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- \
+            defconfig
+          make -C linux-sdm845-6.16-rc2-4 O=out ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- \
+            -j$(nproc) Image dtbs
+
+      # --------------------------------------------------------------------
+      # 3. 构建 initrd 并生成 boot.img
+      # --------------------------------------------------------------------
+      - name: Cache initrd build files
+        uses: actions/cache@v4
+        with:
+          path: out/arch/arm64/boot
+          key: ${{ env.CACHE_KEY }}-initrd
+          restore-keys: ${{ env.CACHE_KEY }}-initrd
+
+      - name: Build initrd
+        run: |
+          cd linux-sdm845-6.16-rc2-4
+          # 先把官方内核的 initramfs 拷贝出来（以后会用它做 boot.img）
+          rm -f initrd.img
+          make -C tools/misc/initramfs-mkinitramfs \
+            IMG=initrd.img \
+            KERNEL=arch/arm64/boot/Image \
+            MODULES=out/arch/arm64/boot/dts/mediatek \
+            DTBS=out/arch/arm64/boot/dts/mediatek \
+            TUNE=0
+
+      - name: Build boot.img
+        run: |
+          cd linux-sdm845-6.16-rc2-4
+          # 将 initrd 直接拼接到 boot.img（按你自己的方案可自行改）
+          cat initrd.img > boot.img
+          echo 'config.txt' >> boot.img
+
+      # --------------------------------------------------------------------
+      # 4. 制作 rootfs
+      # --------------------------------------------------------------------
+      - name: Cache Ubuntu‑Base
+        uses: actions/cache@v4
+        with:
+          path: ubuntu-base
+          key: ${{ env.CACHE_KEY }}-ubuntu-base
+          restore-keys: ${{ env.CACHE_KEY }}-ubuntu-base
+
+      - name: Download Ubuntu‑Base
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          wget -O ubuntu-base.tar.gz ${{ env.UBUNTU_BASE }}
+
+      - name: Create rootfs image file
+        run: |
+          dd if=/dev/zero of=rootfs.img bs=1M count=10240  # 10 GiB
+          mkfs.ext4 -F -L ubuntu-rootfs rootfs.img
+
+      - name: Mount rootfs
+        run: |
+          mkdir -p mount-root
+          mount -o loop rootfs.img mount-root
+
+      - name: Prepare for chroot
+        run: |
+          mkdir -p mount-root/{proc,sys,dev}
+          mount -t proc none mount-root/proc
+          mount -t sysfs none mount-root/sys
+          mount -t devtmpfs devtmpfs mount-root/dev
+
+      # --------------------------------------------------------------------
+      # 5. 在 chroot 内安装基础软件
+      # --------------------------------------------------------------------
+      - name: Install base packages inside chroot
+        run: |
+          chroot mount-root /bin/bash <<'EOF'
+          apt-get update -y
+          apt-get upgrade -y
+          apt-get install -y ca-certificates dialog locales nano apt-utils
+          locale-gen en_US.UTF-8 zh_CN.UTF-8
+          echo 'OnePlus6T' > /etc/hostname
+          apt-get install -y ubuntu-desktop
+          adduser --disabled-password --gecos "" athbe
+          usermod -aG sudo,adm,dialout,cdrom,floppy,audio,dip,video,plugdev athbe
+          echo 'snd-soc-tfa98xx' > /etc/modules-load.d/snd-soc-tfa98xx.conf
+          EOF
+
+      # --------------------------------------------------------------------
+      # 6. 复制固件、驱动、模块等
+      # --------------------------------------------------------------------
+      - name: Copy firmware
+        run: |
+          mkdir -p mount-root/firmware
+          tar -xf firmware.tar -C mount-root/firmware
+
+      - name: Install kernel modules into Ubuntu
+        run: |
+          # 把内核的 modules 复制到 Ubuntu rootfs
+          rsync -a linux-sdm845-6.16-rc2-4/out/arch/arm64/boot/lib/modules/ mount-root/lib/modules
+          # 把驱动包也拷贝进去（你可以按需改名）
+          rsync -a linux-sdm845-6.16-rc2-4/out/arch/arm64/boot/dts/mediatek/* mount-root/firmware/dtbs
+
+      # --------------------------------------------------------------------
+      # 7. 安装其它自定义服务
+      # --------------------------------------------------------------------
       - name: Install tty console service
         run: |
-          curl -O https://cloud.athbe.cn/f/7BHR/ttygs0-console.sh
-          #wget -O ttygs0-console.sh ${{ env.TTY_SCRIPT }}
-          sudo chmod +x ttygs0-console.sh
-          sudo mv ttygs0-console.sh /usr/local/bin/
-          pwd
-          ls -ltrh
-          
-          sudo tee ubuntu/etc/systemd/system/oneplus6t-console.service >/dev/null <<'EOF'
+          wget -O ttygs0-console.sh ${{ env.TTY_SCRIPT }}
+          chmod +x ttygs0-console.sh
+          mv ttygs0-console.sh /usr/local/bin/
+          tee mount-root/etc/systemd/system/oneplus6t-console.service >/dev/null <<'EOF'
           [Unit]
           Description=OnePlus6T USB Console Service
           After=syslog.target systemd-modules-load.service systemd-udevd.service
@@ -61,9 +208,9 @@ jobs:
           WantedBy=multi-user.target
           EOF
 
-      - name: Install shutdown-modem service
+      - name: Install shutdown‑modem service
         run: |
-          sudo tee ubuntu/etc/systemd/system/shutdown-modem.service >/dev/null <<'EOF'
+          tee mount-root/etc/systemd/system/shutdown-modem.service >/dev/null <<'EOF'
           [Unit]
           Description=Poweroff modem remoteproc to prevent wlan fw crash
           DefaultDependencies=no
@@ -77,14 +224,44 @@ jobs:
           WantedBy=shutdown.target
           EOF
 
-      # ------------------------------------------------------------------
-      # 其它步骤保持原样（例如 Build kernel, Build initrd, Build boot.img,
-      # Create rootfs, etc.）----------------------------------------------
-      # ------------------------------------------------------------------
+      - name: Install bootmac tool
+        run: |
+          git clone --depth=1 ${{ env.BOOTMAC_REPO }} bootmac
+          cd bootmac
+          make -f Makefile
+
+      # --------------------------------------------------------------------
+      # 8. 卸载并清理
+      # --------------------------------------------------------------------
+      - name: Unmount rootfs
+        run: |
+          umount mount-root/dev
+          umount mount-root/sys
+          umount mount-root/proc
+          umount mount-root
+          rmdir mount-root
+
+      # --------------------------------------------------------------------
+      # 9. 把 10 GiB 的稀疏 ext4 转成 sparse image，方便后续使用
+      # --------------------------------------------------------------------
+      - name: Convert rootfs to sparse image
+        run: |
+          e2fsck -f -y rootfs.img
+          truncate --size=0 rootfs.img
+          mkfs.ext4 -F -L ubuntu-rootfs rootfs.img
+          # 把文件内容拷进去（根文件系统已经在 `mount-root` 里了）
+          sudo cp -a mount-root/. rootfs.img
+          # 生成 sparse 版本
+          truncate -s 0 rootfs-sparse.img
+          dd if=rootfs.img of=rootfs-sparse.img conv=sparse
+
+      # --------------------------------------------------------------------
+      # 10. 上传结果
+      # --------------------------------------------------------------------
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: boot-rootfs
           path: |
             boot.img
-            rootfs.img
+            rootfs-sparse.img
