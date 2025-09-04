@@ -1,0 +1,274 @@
+# .github/workflows/build-boot-image.yml
+name: Build OnePlus6T Boot + RootFS
+
+on:
+  workflow_dispatch:          # 允许手动触发
+  push:
+    branches: [main]          # 也可以配置为 push 或 PR 触发
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest   # GitHub 自带的 Ubuntu 22.04 runner
+
+    # ---- 下面的 cache 选项可以显著缩短多次构建时间 ----
+    # 1. 缓存 apt 包
+    # 2. 缓存 kernel 源码
+    # 3. 缓存 initrd build 产生的 tarball
+    # 4. 缓存 rootfs 生成的文件
+    # 你可以根据需要自行打开或关闭
+    # steps 中对应的 `id` 用来做 cache 的 key
+    # -----------------------------------------------
+    env:
+      # 对外部下载链接做一次统一定义，便于后面使用
+      KERNEL_REPO: https://gitlab.com/sdm845-mainline/linux.git
+      KERNEL_BRANCH: sdm845-6.16-rc2-4
+      CONFIG_URL: https://cloud.athbe.cn/f/D3Uq/sdm845.config
+      CHECK_SCRIPT: https://cloud.athbe.cn/f/2MTG/check.sh
+      DTB_URL: https://cloud.athbe.cn/f/WEhm/OnePlus6T.dtb
+      INITRD_REPO: https://gitlab.com/sdm845-mainline/initrd.git
+      UBUNTU_BASE: https://cdimage.ubuntu.com/ubuntu-base/releases/25.04/release/ubuntu-base-25.04-base-arm64.tar.gz
+      FIRMWARE_URL: https://cloud.athbe.cn/f/6nSr/firmware.tar.gz
+      QRTR_ZIP: https://cloud.athbe.cn/f/mJuG/qrtr%2Ctqftpserv%2Crmtfs%2Cpd-mapper.zip
+      TTY_SCRIPT: https://cloud.athbe.cn/f/7BHR/ttygs0-console.sh
+      BOOTMAC_REPO: https://gitlab.postmarketos.org/postmarketOS/bootmac.git
+
+    steps:
+      # ---- 1. 基础环境 ----
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends \
+            build-essential \
+            openssl pkg-config libssl-dev libncurses5-dev \
+            minizip libelf-dev flex bison libc6-dev libidn11-dev \
+            rsync bc liblz4-tool \
+            gcc-aarch64-linux-gnu dpkg dpkg-dev git debhelper \
+            arch-install-scripts qemu-user-static android-platform-system-core mkbootimg \
+            ca-certificates dialog locales nano apt-utils \
+            net-tools network-manager iputils-ping bash-completion \
+            busybox-initramfs cpio initramfs-tools initramfs-tools-bin initramfs-tools-core \
+            linux-base netplan.io git wget ntp systemd-resolved \
+            ubuntu-desktop \
+            gnupg2 \
+            libudev-dev
+
+      # ---- 2. 克隆并编译内核 ----
+      - name: Cache kernel source
+        uses: actions/cache@v4
+        with:
+          path: linux-sdm845-6.16-rc2-4
+          key: ${{ runner.os }}-kernel-${{ env.KERNEL_BRANCH }}-${{ hashFiles('linux-sdm845-6.16-rc2-4/.config') }}
+
+      - name: Clone kernel source
+        if: !contains(steps.cache.outputs.cache-hit, 'true')
+        run: |
+          git clone --branch ${{ env.KERNEL_BRANCH }} --depth 1 ${{ env.KERNEL_REPO }} linux-sdm845-6.16-rc2-4
+
+      - name: Download and process config
+        run: |
+          wget -O sdm845.config ${{ env.CONFIG_URL }}
+          wget -O check.sh ${{ env.CHECK_SCRIPT }}
+          chmod +x check.sh
+          ./check.sh sdm845.config -w
+          mv sdm845.config linux-sdm845-6.16-rc2-4/.config
+
+      - name: Enable serial gadget
+        run: |
+          cd linux-sdm845-6.16-rc2-4
+          # Use a minimal patch to enable the config
+          sed -i 's/# CONFIG_USB_SERIAL_GADGET is not set/CONFIG_USB_SERIAL_GADGET=y/' .config
+          # Or you can use menuconfig non-interactively if you prefer
+          # make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- menuconfig <<< $'\\n'
+
+      - name: Compile kernel
+        run: |
+          cd linux-sdm845-6.16-rc2-4
+          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc)
+
+      - name: Save vmlinuz
+        run: |
+          cp linux-sdm845-6.16-rc2-4/arch/arm64/boot/vmlinuz .
+
+      # ---- 3. 准备 DTB + initrd ----
+      - name: Download DTB
+        run: wget -O OnePlus6T.dtb ${{ env.DTB_URL }}
+
+      - name: Build initrd
+        run: |
+          git clone ${{ env.INITRD_REPO }}
+          cd initrd
+          ./build.sh
+          mv initrd.cpio.gz ..
+
+      # ---- 4. 生成 boot.img ----
+      - name: Create kernel+dtb blob
+        run: cat vmlinuz OnePlus6T.dtb > kernel-dtb
+
+      - name: Build boot.img
+        run: |
+          mkbootimg \
+            --base 0x00000000 \
+            --kernel_offset 0x00008000 \
+            --ramdisk_offset 0x01000000 \
+            --tags_offset 0x00000100 \
+            --pagesize 4096 \
+            --second_offset 0x00f00000 \
+            --ramdisk initrd.cpio.gz \
+            --cmdline "earlycon=tty0 earlyprintk root=/dev/sda17 rootfstype=ext4 rootwait=10 loglevel=3 debug rw splash" \
+            --kernel kernel-dtb \
+            -o boot.img
+
+      # ---- 5. 准备 rootfs ----
+      - name: Download Ubuntu base
+        run: wget -O ubuntu-base.tar.gz ${{ env.UBUNTU_BASE }}
+
+      - name: Build rootfs image
+        run: |
+          dd if=/dev/zero of=ubuntu.img bs=1G count=10
+          mkfs.ext4 ubuntu.img
+          mkdir -p ubuntu
+          sudo mount ubuntu.img ubuntu
+          cd ubuntu
+          sudo tar -xpvf ../ubuntu-base.tar.gz
+          cd ..
+
+      - name: Setup chroot environment
+        run: |
+          sudo mount --bind /dev ubuntu/dev
+          sudo mount -t devpts devpts ubuntu/dev/pts -o gid=5,mode=620
+          sudo mount -t proc proc ubuntu/proc
+          sudo mount -t sysfs sysfs ubuntu/sys
+          sudo mount -t tmpfs tmpfs ubuntu/run
+          sudo cp /etc/resolv.conf ubuntu/etc/resolv.conf
+
+      - name: Configure apt mirror (optional)
+        run: |
+          echo "deb http://mirrors.ustc.edu.cn/ubuntu/ jammy main restricted universe multiverse\n\
+deb http://mirrors.ustc.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse\n\
+deb http://mirrors.ustc.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse\n\
+deb http://mirrors.ustc.edu.cn/ubuntu/ jammy-security main restricted universe multiverse" > ubuntu/etc/apt/sources.list
+
+      - name: Install base packages inside chroot
+        run: |
+          sudo chroot ubuntu /bin/bash <<'EOF'
+          apt-get update -y
+          apt-get upgrade -y
+          apt-get install -y ca-certificates dialog locales nano apt-utils
+          locale-gen en_US.UTF-8 zh_CN.UTF-8
+          echo 'OnePlus6T' > /etc/hostname
+          apt-get install -y man-db sudo openssh-server net-tools network-manager iputils-ping bash-completion kmod busybox-initramfs cpio initramfs-tools initramfs-tools-bin initramfs-tools-core linux-base netplan.io git wget ntp systemd-resolved
+          apt-get install -y ubuntu-desktop
+          # 创建用户
+          adduser --disabled-password --gecos "" athbe
+          usermod -aG sudo,adm,dialout,cdrom,floppy,audio,dip,video,plugdev athbe
+          # 让声音模块自动加载
+          echo 'snd-soc-tfa98xx' > /etc/modules-load.d/snd-soc-tfa98xx.conf
+          EOF
+
+      - name: Copy firmware
+        run: |
+          wget -O firmware.tar.gz ${{ env.FIRMWARE_URL }}
+          tar -xzf firmware.tar.gz
+          sudo mv firmware ubuntu/lib/
+
+      - name: Install kernel modules
+        run: |
+          make -C linux-sdm845-6.16-rc2-4 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- INSTALL_MOD_PATH=ubuntu modules_install
+          make -C linux-sdm845-6.16-rc2-4 ARCH=arm64 INSTALL_PATH=ubuntu/boot install
+
+      - name: Install qrtr/… debs
+        run: |
+          wget -O qrtr.zip ${{ env.QRTR_ZIP }}
+          unzip -o qrtr.zip -d qrtr
+          sudo dpkg -i qrtr/*.deb
+          sudo apt-get install -f -y
+          sudo systemctl enable qrtr-ns tqftpserv rmtfs pd-mapper
+
+      - name: Add initramfs hook for firmware
+        run: |
+          sudo sh -c 'cat > ubuntu/usr/share/initramfs-tools/hooks/qcom-firmware <<EOF
+          #!/bin/sh
+          set -e
+          . /usr/share/initramfs-tools/hook-functions
+          add_firmware qcom/sdm845/oneplus6/a630_zap.mbn
+          add_firmware qcom/sdm845/oneplus6/ipa_fws.mbn
+          EOF
+          chmod +x ubuntu/usr/share/initramfs-tools/hooks/qcom-firmware'
+
+      - name: Install tty console service
+        run: |
+          wget -O ttygs0-console.sh ${{ env.TTY_SCRIPT }}
+          sudo chmod +x ttygs0-console.sh
+          sudo mv ttygs0-console.sh /usr/local/bin/
+          sudo tee ubuntu/etc/systemd/system/oneplus6t-console.service >/dev/null <<EOF
+          [Unit]
+          Description=OnePlus6T USB Console Service
+          After=syslog.target systemd-modules-load.service systemd-udevd.service
+          Wants=systemd-modules-load.service systemd-udevd.service
+
+          [Service]
+          Type=simple
+          ExecStart=/usr/local/bin/ttygs0-console.sh
+          Restart=always
+          RestartSec=10
+          StandardOutput=syslog
+          StandardError=syslog
+          SyslogIdentifier=oneplus6t-console
+
+          [Install]
+          WantedBy=multi-user.target
+          EOF
+
+      - name: Install shutdown-modem service
+        run: |
+          sudo tee ubuntu/etc/systemd/system/shutdown-modem.service >/dev/null <<EOF
+          [Unit]
+          Description=Poweroff modem remoteproc to prevent wlan fw crash
+          DefaultDependencies=no
+          Before=shutdown.target
+
+          [Service]
+          Type=oneshot
+          ExecStart=echo stop | tee /sys/class/remoteproc/remoteproc*/state
+
+          [Install]
+          WantedBy=shutdown.target
+          EOF
+
+      - name: Install bootmac
+        run: |
+          git clone ${{ env.BOOTMAC_REPO }}
+          sudo mv bootmac/bootmac /usr/bin/
+          sudo mv bootmac/bootmac-bluetooth.service /etc/systemd/system/
+          sudo systemctl enable bootmac-bluetooth.service
+
+      - name: Enable services inside chroot
+        run: |
+          sudo chroot ubuntu /bin/bash <<'EOF'
+          systemctl enable oneplus6t-console.service shutdown-modem.service bootmac-bluetooth.service
+          EOF
+
+      - name: Clean up
+        run: |
+          sudo umount ubuntu/{run,sys,proc,dev/pts,dev}
+          sudo rm -rf ubuntu
+
+      # ---- 6. 打包最终镜像 ----
+      - name: Convert ext4 to sparse image
+        run: |
+          # GitHub Actions runner 默认不提供 img2simg，手工实现
+          # 这里直接把 ext4 image 当成最终镜像即可
+          mv ubuntu.img rootfs.img
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: boot-rootfs
+          path: |
+            boot.img
+            rootfs.img
+
