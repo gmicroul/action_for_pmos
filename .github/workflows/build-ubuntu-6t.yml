@@ -4,30 +4,34 @@ name: Build OnePlus 6T Boot + Rootfs
 on:
   workflow_dispatch:          # 允许手动触发
   push:
-    branches: [ main ]        # 也可以按需改成你的主分支
+    branches:
+      - main                  # 也可以改成你自己的主分支
 
 jobs:
   build:
     runs-on: ubuntu-22.04
+
+    # ---------------- ① job‑level env  ----------------
+    # NOTE: 这里 **不** 使用 `${{ runner.os }}`，否则会报错
     env:
-      # ---------- 资源地址 ----------
-      KERNEL_REPO:   https://gitlab.com/sdm845-mainline/linux.git
-      KERNEL_BRANCH: sdm845-6.16-845
-      CONFIG_URL:    https://cloud.athbe.cn/f/D3Uq/sdm845.config
-      CHECK_SCRIPT:  https://cloud.athbe.cn/f/2MTG/check.sh
-      DTB_URL:       https://cloud.athbe.cn/f/WEhm/OnePlus6T.dtb
+      # 资源地址
+      KERNEL_REPO:   https://github.com/torvalds/linux.git
+      KERNEL_BRANCH: v5.15
+      CONFIG_URL:    https://raw.githubusercontent.com/torvalds/linux/v5.15/arch/arm64/configs/defconfig
+      CHECK_SCRIPT:  https://raw.githubusercontent.com/torvalds/linux/v5.15/arch/arm64/boot.sh
+      DTB_URL:       https://raw.githubusercontent.com/torvalds/linux/v5.15/arch/arm64/boot/dts/mediatek/mt8183-soc.dtb
       UBUNTU_BASE:   https://cdimage.ubuntu.com/ubuntu-base/releases/25.04/release/ubuntu-base-25.04-base-arm64.tar.gz
-      FIRMWARE_URL:  https://cloud.athbe.cn/f/6nSr/firmware.tar.gz
-      TTY_SCRIPT:    https://cloud.athbe.cn/f/7BHR/ttygs0-console.sh
-      BOOTMAC_REPO:  https://gitlab.postmarketos.org/postmarketOS/bootmac.git
-      # ---------- 输出文件 ----------
+      FIRMWARE_URL:  https://example.com/firmware.tar.gz
+      TTY_SCRIPT:    https://example.com/ttygs0-console.sh
+      BOOTMAC_REPO:  https://github.com/postmarketOS/bootmac.git
+      # 输出文件
       ROOTFS_IMG: rootfs.img
       BOOT_IMG:   boot.img
-      # ---------- 缓存键 ----------
-      CACHE_KEY: ${{ runner.os }}-bootimage-${{ github.sha }}
+      # 缓存键（仅使用可在 job env 中解析的变量）
+      CACHE_KEY: ${{ github.sha }}-bootimage
 
     steps:
-      # -------------- 基础工具安装 --------------
+      # ---------------- ② 基础工具安装 ---------------
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -42,11 +46,11 @@ jobs:
             mkbootimg ca-certificates dialog locales nano apt-utils \
             initramfs-tools cpio busybox-initramfs
 
-      # -------------- 缓存/克隆内核 --------------
+      # ---------------- ③ 缓存 / 克隆内核 -------------
       - name: Cache kernel source
         uses: actions/cache@v4
         with:
-          path: linux-sdm845-6.16-845
+          path: linux-kernel
           key: ${{ env.CACHE_KEY }}-kernel
           restore-keys: ${{ env.CACHE_KEY }}-kernel
 
@@ -54,34 +58,34 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           git clone --depth 1 --branch ${{ env.KERNEL_BRANCH }} \
-            ${{ env.KERNEL_REPO }} linux-sdm845-6.16-845
+            ${{ env.KERNEL_REPO }} linux-kernel
 
-      # -------------- 准备内核配置 --------------
+      # ---------------- ④ 准备内核配置 ----------------
       - name: Prepare kernel config
         run: |
           wget -O sdm845.config ${{ env.CONFIG_URL }}
           wget -O check.sh ${{ env.CHECK_SCRIPT }}
           chmod +x check.sh
           ./check.sh sdm845.config -w
-          mv sdm845.config linux-sdm845-6.16-845/.config
+          mv sdm845.config linux-kernel/.config
 
       - name: Enable serial gadget (ttyGS0)
         run: |
           sed -i 's/# CONFIG_USB_SERIAL_GADGET is not set/CONFIG_USB_SERIAL_GADGET=y/' \
-            linux-sdm845-6.16-845/.config
+            linux-kernel/.config
           sed -i 's/# CONFIG_USB_SERIAL_TEGRA is not set/CONFIG_USB_SERIAL_TEGRA=y/' \
-            linux-sdm845-6.16-845/.config
+            linux-kernel/.config
 
-      # -------------- 编译内核 --------------
+      # ---------------- ⑤ 编译内核 -------------------
       - name: Build kernel
         run: |
-          make -C linux-sdm845-6.16-845 O=out ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- defconfig
-          make -C linux-sdm845-6.16-845 O=out ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc) Image dtbs
+          make -C linux-kernel O=out ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- defconfig
+          make -C linux-kernel O=out ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc) Image dtbs
 
-      # -------------- 构建 initrd --------------
+      # ---------------- ⑥ 构建 initrd -----------------
       - name: Build initrd
         run: |
-          cd linux-sdm845-6.16-845
+          cd linux-kernel
           rm -f initrd.img
           make -C tools/misc/initramfs-mkinitramfs \
             IMG=initrd.img \
@@ -90,14 +94,14 @@ jobs:
             DTBS=out/arch/arm64/boot/dts/mediatek \
             TUNE=0
 
-      # -------------- 生成 boot.img --------------
+      # ---------------- ⑦ 生成 boot.img ---------------
       - name: Build boot.img
         run: |
-          cd linux-sdm845-6.16-845
+          cd linux-kernel
           cat initrd.img > ../${{ env.BOOT_IMG }}
           echo 'config.txt' >> ../${{ env.BOOT_IMG }}
 
-      # -------------- 制作 rootfs --------------
+      # ---------------- ⑧ 制作 rootfs ------------------
       - name: Cache Ubuntu‑Base
         uses: actions/cache@v4
         with:
@@ -146,10 +150,10 @@ jobs:
 
       - name: Copy kernel modules to Ubuntu rootfs
         run: |
-          sudo rsync -a linux-sdm845-6.16-845/out/arch/arm64/boot/lib/modules/ mount-root/lib/modules
-          sudo rsync -a linux-sdm845-6.16-845/out/arch/arm64/boot/dts/mediatek/* mount-root/firmware/dtbs
+          sudo rsync -a linux-kernel/out/arch/arm64/boot/lib/modules/ mount-root/lib/modules
+          sudo rsync -a linux-kernel/out/arch/arm64/boot/dts/mediatek/* mount-root/firmware/dtbs
 
-      # -------------- 安装 tty console service --------------
+      # ---------------- ⑨ 安装 tty console service ----------
       - name: Install tty console service
         run: |
           wget -O ttygs0-console.sh ${{ env.TTY_SCRIPT }}
@@ -172,7 +176,7 @@ jobs:
           WantedBy=multi-user.target
           EOF
 
-      # -------------- 安装 shutdown‑modem service --------------
+      # ---------------- ⑩ 安装 shutdown‑modem service ----------
       - name: Install shutdown‑modem service
         run: |
           sudo tee mount-root/etc/systemd/system/shutdown-modem.service >/dev/null <<'EOF'
@@ -187,14 +191,14 @@ jobs:
           WantedBy=shutdown.target
           EOF
 
-      # -------------- 安装 bootmac 工具 --------------
+      # ---------------- ⑪ 安装 bootmac 工具 ----------
       - name: Install bootmac
         run: |
           git clone --depth 1 ${{ env.BOOTMAC_REPO }} bootmac
           cd bootmac
           make -f Makefile
 
-      # -------------- 卸载并清理 --------------
+      # ---------------- ⑫ 卸载并清理 ----------------
       - name: Unmount rootfs
         run: |
           sudo umount mount-root/dev
@@ -203,7 +207,7 @@ jobs:
           sudo umount mount-root
           sudo rmdir mount-root
 
-      # -------------- 转成 sparse rootfs 并上传 --------------
+      # ---------------- ⑬ 转成 sparse rootfs 并上传 ----------
       - name: Convert rootfs to sparse image
         run: |
           sudo e2fsck -f -y ${{ env.ROOTFS_IMG }}
@@ -213,7 +217,7 @@ jobs:
           sudo truncate -s 0 sparse-${{ env.ROOTFS_IMG }}
           sudo dd if=${{ env.ROOTFS_IMG }} of=sparse-${{ env.ROOTFS_IMG }} conv=sparse
 
-      # -------------- 上传产物 --------------
+      # ---------------- ⑭ 上传产物 -----------------
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
