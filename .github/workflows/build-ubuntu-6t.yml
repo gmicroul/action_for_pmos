@@ -39,7 +39,8 @@ jobs:
           #wget -O ttygs0-console.sh ${{ env.TTY_SCRIPT }}
           sudo chmod +x ttygs0-console.sh
           sudo mv ttygs0-console.sh /usr/local/bin/
-          sudo ls ubuntu/etc/systemd/system/|grep oneplus
+          pwd
+          ls -ltrh
           
           sudo tee ubuntu/etc/systemd/system/oneplus6t-console.service >/dev/null <<'EOF'
           [Unit]
