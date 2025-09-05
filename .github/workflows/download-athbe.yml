@@ -26,7 +26,7 @@ jobs:
         id: compile
         run: |
           #curl -LO "https://github.com/fedora-remix-mobility/fedora-kiwi-descriptions/releases/download/2025-04-04/Fedora-SDM845-Remix.tar.xz"
-          wget "https://cloud.athbe.cn/f/D3Uq/sdm845.config"
+          wget https://cloud.athbe.cn/f/6nSr/firmware.tar.gz
           pwd
           ls -ltrh
           
@@ -36,16 +36,16 @@ jobs:
       - name: Upload file
         uses: actions/upload-artifact@v4
         with:
-          name: sdm845.config
-          path: ./*.config
+          name: firmware.tar.gz
+          path: ./firmware.tar.gz
 
       - name: Upload image to Release
         uses: ncipollo/release-action@main
         if: steps.compile.outputs.status == 'success' && !cancelled()
         with:
           tag: sdm845.config_${{ env.COMPILE_STARTINGTIME }}
-          artifacts: ./*.config
+          artifacts: ./firmware.tar.gz
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
-            This is sdm845.config_${{ env.LINUX_GITURL }}
+            This is firmware.tar.gz_${{ env.LINUX_GITURL }}
