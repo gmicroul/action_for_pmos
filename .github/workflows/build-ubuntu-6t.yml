@@ -2,10 +2,19 @@
 name: Build OnePlus 6T Boot + Rootfs
 
 on:
-  workflow_dispatch:          # 允许手动触发
-  push:
-    branches:
-      - main                  # 也可以改成你自己的主分支
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      set_git_repo:
+        description: "aarch64"
+        required: true
+        default: "athbe"
+
+#on:
+#  workflow_dispatch:          # 允许手动触发
+#  push:
+#    branches:
+#      - main                  # 也可以改成你自己的主分支
 
 jobs:
   build:
