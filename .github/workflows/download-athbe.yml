@@ -30,7 +30,7 @@ jobs:
           wget  "http://kaixinit.com/wp-content/uploads/2025/09/firmware.tar.gz"
           pwd
           ls -ltrh
-          mv 5AukWsyC6 firmware.tar.gz
+          
           
           echo "::set-output name=status::success"
           
