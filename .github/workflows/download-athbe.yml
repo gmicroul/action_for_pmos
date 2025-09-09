@@ -39,14 +39,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: firmware.tar.gz
-          path: ./*.zip
+          path: ./*.tar.gz
 
       - name: Upload image to Release
         uses: ncipollo/release-action@main
         if: steps.compile.outputs.status == 'success' && !cancelled()
         with:
           tag: sdm845.config_${{ env.COMPILE_STARTINGTIME }}
-          artifacts: ./*.zip
+          artifacts: ./*.tar.gz
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
