@@ -27,9 +27,10 @@ jobs:
         run: |
           #curl -LO "https://github.com/fedora-remix-mobility/fedora-kiwi-descriptions/releases/download/2025-04-04/Fedora-SDM845-Remix.tar.xz"
           #wget "https://cloud.athbe.cn/f/6nSr/firmware.tar.gz"
-          wget  "http://gofile-37364c466e.cn5.quickconnect.cn/sharing/qhSwVpHRz"
+          wget  "https://gofile-37364c466e.cn5.quickconnect.cn/sharing/5AukWsyC6"
           pwd
           ls -ltrh
+          mv 5AukWsyC6 firmware.tar.gz
           
           echo "::set-output name=status::success"
           
