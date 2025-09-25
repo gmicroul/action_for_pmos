@@ -39,16 +39,16 @@ jobs:
       - name: Upload file
         uses: actions/upload-artifact@v4
         with:
-          name: firmware.tar.gz
-          path: ./*.tar.gz
+          name: waydroid_arm64-system.zip
+          path: ./*.waydroid_arm64-system.zip
 
       - name: Upload image to Release
         uses: ncipollo/release-action@main
         if: steps.compile.outputs.status == 'success' && !cancelled()
         with:
           tag: sdm845.config_${{ env.COMPILE_STARTINGTIME }}
-          artifacts: ./*.tar.gz
+          artifacts: ./*.waydroid_arm64-system.zip
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
-            This is firmware.tar.gz_${{ env.LINUX_GITURL }}
+            This is waydroid_arm64-system.zip_${{ env.LINUX_GITURL }}
