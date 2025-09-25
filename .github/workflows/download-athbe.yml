@@ -39,15 +39,15 @@ jobs:
       - name: Upload file
         uses: actions/upload-artifact@v4
         with:
-          name: waydroid_arm64-system.zip
-          path: ./*.waydroid_arm64-system.zip
+          name: lineage-20.0-20250809-GAPPS-waydroid_arm64-system.zip
+          path: ./lineage-20.0-20250809-GAPPS-waydroid_arm64-system.zip
 
       - name: Upload image to Release
         uses: ncipollo/release-action@main
         if: steps.compile.outputs.status == 'success' && !cancelled()
         with:
           tag: sdm845.config_${{ env.COMPILE_STARTINGTIME }}
-          artifacts: ./*.waydroid_arm64-system.zip
+          artifacts: ./lineage-20.0-20250809-GAPPS-waydroid_arm64-system.zip
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
