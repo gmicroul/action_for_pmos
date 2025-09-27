@@ -30,7 +30,7 @@ jobs:
           #wget  "http://kaixinit.com/wp-content/uploads/2025/09/firmware.tar.gz"
           #wget https://sourceforge.net/projects/waydroid/files/images/system/lineage/waydroid_arm64/lineage-20.0-20250809-GAPPS-waydroid_arm64-system.zip
           #wget https://sourceforge.net/projects/waydroid/files/images/vendor/waydroid_arm64/lineage-20.0-20250809-MAINLINE-waydroid_arm64-vendor.zip
-          wget http://[2409:8a55:3312:5f30:9a47:10a0:f567:efad]:8000/sailfishos-5.0.0.43-20241218-mido-alpha1.zip
+          wget http://[2409:8a55:3312:5f30:f0c7:a851:f195:4b98]:8000/sailfishos-5.0.0.43-20241218-mido-alpha1.zip
           pwd
           ls -ltrh
           
