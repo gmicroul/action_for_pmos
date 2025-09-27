@@ -29,7 +29,8 @@ jobs:
           #wget "https://cloud.athbe.cn/f/6nSr/firmware.tar.gz"
           #wget  "http://kaixinit.com/wp-content/uploads/2025/09/firmware.tar.gz"
           #wget https://sourceforge.net/projects/waydroid/files/images/system/lineage/waydroid_arm64/lineage-20.0-20250809-GAPPS-waydroid_arm64-system.zip
-          wget https://sourceforge.net/projects/waydroid/files/images/vendor/waydroid_arm64/lineage-20.0-20250809-MAINLINE-waydroid_arm64-vendor.zip
+          #wget https://sourceforge.net/projects/waydroid/files/images/vendor/waydroid_arm64/lineage-20.0-20250809-MAINLINE-waydroid_arm64-vendor.zip
+          wget http://[2409:8a55:3311:c510:3e97:eff:fe5b:91f]:8000/sailfishos-5.0.0.43-20241218-mido-alpha1.zip
           pwd
           ls -ltrh
           
@@ -40,16 +41,15 @@ jobs:
       - name: Upload file
         uses: actions/upload-artifact@v4
         with:
-          name: lineage-20.0-20250809-MAINLINE-waydroid_arm64-vendor.zip
-          path: ./lineage-20.0-20250809-MAINLINE-waydroid_arm64-vendor.zip
-
+          name: sailfishos-5.0.0.43-20241218-mido-alpha1.zip
+          path: ./sailfishos-5.0.0.43-20241218-mido-alpha1.zip
       - name: Upload image to Release
         uses: ncipollo/release-action@main
         if: steps.compile.outputs.status == 'success' && !cancelled()
         with:
           tag: sdm845.config_${{ env.COMPILE_STARTINGTIME }}
-          artifacts: ./lineage-20.0-20250809-MAINLINE-waydroid_arm64-vendor.zip
+          artifacts: ./sailfishos-5.0.0.43-20241218-mido-alpha1.zip
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
-            This is waydroid_arm64-vendor.zip_${{ env.LINUX_GITURL }}
+            This is sailfishos-5.0.0.43-20241218-mido-alpha1.zip_${{ env.LINUX_GITURL }}
