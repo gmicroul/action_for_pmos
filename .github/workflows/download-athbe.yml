@@ -30,7 +30,7 @@ jobs:
           #wget  "http://kaixinit.com/wp-content/uploads/2025/09/firmware.tar.gz"
           #wget https://sourceforge.net/projects/waydroid/files/images/system/lineage/waydroid_arm64/lineage-20.0-20250809-GAPPS-waydroid_arm64-system.zip
           #wget https://sourceforge.net/projects/waydroid/files/images/vendor/waydroid_arm64/lineage-20.0-20250809-MAINLINE-waydroid_arm64-vendor.zip
-          wget "https://wormhole.app/d9D9or#:~:text=sailfishos%2D5.0.0.43%2D20241218%2D-,mido,-%2Dalpha1.zip"
+          curl -LO "blob:https://wormhole.app/f9374107-605a-4463-801c-efaaa7250857"
           pwd
           ls -ltrh
           
