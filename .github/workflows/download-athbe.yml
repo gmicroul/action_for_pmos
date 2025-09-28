@@ -30,7 +30,7 @@ jobs:
           #wget  "http://kaixinit.com/wp-content/uploads/2025/09/firmware.tar.gz"
           #wget https://sourceforge.net/projects/waydroid/files/images/system/lineage/waydroid_arm64/lineage-20.0-20250809-GAPPS-waydroid_arm64-system.zip
           #wget https://sourceforge.net/projects/waydroid/files/images/vendor/waydroid_arm64/lineage-20.0-20250809-MAINLINE-waydroid_arm64-vendor.zip
-          wget https://drive.usercontent.google.com/download?id=1QfLH0L8Nx-X_f1hJvREYOHbO2nr_skUR&export=download&authuser=0&confirm=t&uuid=3ce3dd9c-f515-4759-abf8-4437212f0827&at=AN8xHor1ioV1gPU57AfVnWrALeTs%3A1759019294680
+          wget "https://drive.usercontent.google.com/open?id=1QfLH0L8Nx-X_f1hJvREYOHbO2nr_skUR&authuser=0"
           pwd
           ls -ltrh
           
