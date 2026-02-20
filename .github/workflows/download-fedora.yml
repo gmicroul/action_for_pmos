@@ -26,7 +26,7 @@ jobs:
         id: compile
         run: |
           #curl -LO "https://github.com/fedora-remix-mobility/fedora-kiwi-descriptions/releases/download/2025-04-04/Fedora-SDM845-Remix.tar.xz"
-          curl -LO "https://github.com/pocketblue/pocketblue/releases/download/43.20251220/pocketblue-oneplus-sdm845-phosh-43.7z"
+          curl -LO "https://github.com/VerdandiTeam/droid-config-enchilada/releases/download/5.0.0.67/sailfishos-5.0.0.67-20260214-enchilada-STABLE6-SLOT_a.zip"
           pwd
           #gzip -9 AuroraSDK-5.2.0.75-BT-release-windows-offline-25.10.29-18.59.46.exe
           ls -ltrh
@@ -37,16 +37,16 @@ jobs:
       - name: Upload file
         uses: actions/upload-artifact@v4
         with:
-          name: pocketblue-oneplus-sdm845-phosh-43
-          path: ./*.7z
+          name: sailfishos-5.0.0.67-20260214-enchilada-STABLE6-SLOT_a
+          path: ./*.zip
 
       - name: Upload image to Release
         uses: ncipollo/release-action@main
         if: steps.compile.outputs.status == 'success' && !cancelled()
         with:
-          tag: pocketblue-oneplus-sdm845-phosh-43_${{ env.COMPILE_STARTINGTIME }}
+          tag: sailfishos-5.0.0.67-20260214-enchilada-STABLE6-SLOT_a_${{ env.COMPILE_STARTINGTIME }}
           artifacts: ./*.7z
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
-            This is pocketblue-oneplus-sdm845-phosh-43_${{ env.LINUX_GITURL }}
+            This is sailfishos-5.0.0.67-20260214-enchilada-STABLE6-SLOT_a_${{ env.LINUX_GITURL }}
